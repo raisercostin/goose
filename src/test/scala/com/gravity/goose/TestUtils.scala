@@ -1,6 +1,5 @@
 package com.gravity.goose
 
-import com.gravity.goose.extractors.AdditionalDataExtractor
 import junit.framework.Assert._
 import org.jsoup.nodes.Element
 

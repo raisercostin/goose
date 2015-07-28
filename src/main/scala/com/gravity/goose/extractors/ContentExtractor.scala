@@ -23,6 +23,7 @@ import java.util.{ArrayList, Date}
 import com.gravity.goose.Article
 import com.gravity.goose.text._
 import com.gravity.goose.utils.Logging
+import com.intenthq.gander.Link
 import org.jsoup.nodes.{Attributes, Document, Element}
 import org.jsoup.select._
 
@@ -39,6 +40,7 @@ object ContentExtractor extends Logging {
 }
 
 trait ContentExtractor {
+
   import ContentExtractor._
 
   def getLogger() = logger
@@ -57,10 +59,10 @@ trait ContentExtractor {
   val A_REL_TAG_SELECTOR: String = "a[rel=tag], a[href*=/tag/]"
   val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre", "strong", "li", "code"))
 
-  def getTitle(article: Article): String = {
-    var title: String = string.empty
+  def getTitle(article: Article): String = extractTitle(article.doc)
 
-    val doc = article.doc
+  def extractTitle(doc: Document): String = {
+    var title: String = string.empty
 
     try {
       val titleElem: Elements = doc.getElementsByTag("title")
@@ -137,15 +139,16 @@ trait ContentExtractor {
     if (string.isNullOrEmpty(content)) string.empty else content.trim
   }
 
+  def getMetaDescription(article: Article): String = extractMetaDescription(article.doc)
   /**
   * if the article has meta description set in the source, use that
   */
-  def getMetaDescription(article: Article): String = {
-    var desc = article.doc.select("meta[name=description]").attr("content")
+  def extractMetaDescription(doc: Document): String = {
+    var desc = doc.select("meta[name=description]").attr("content")
     if (desc.isEmpty) {
-      desc = article.doc.select("meta[property=og:description]").attr("content")
+      desc = doc.select("meta[property=og:description]").attr("content")
       if (desc.isEmpty) {
-        desc = article.doc.select("meta[name=twitter:description]").attr("content")
+        desc = doc.select("meta[name=twitter:description]").attr("content")
       }
     }
 
@@ -159,36 +162,36 @@ trait ContentExtractor {
   /**
   * if the article has meta keywords set in the source, use that
   */
-  def getMetaKeywords(article: Article): String = {
-    getMetaContent(article.doc, "meta[name=keywords]")
-  }
+  def getMetaKeywords(article: Article): String = extractMetaKeywords(article.doc)
+
+  def extractMetaKeywords(doc: Document): String = getMetaContent(doc, "meta[name=keywords]")
 
 
   /**
    * if the article has meta canonical link set in the url
    */
-  def getCanonicalLink(article: Article): String = {
-    var url = article.doc.select("link[rel=canonical]").attr("abs:href")
-    trace(logPrefix + " base uri: " + article.doc.baseUri)
+  def extractCanonicalLink(doc: Document): Option[String] = {
+    var url = doc.select("link[rel=canonical]").attr("abs:href")
+    trace(logPrefix + " base uri: " + doc.baseUri)
     trace(logPrefix + " canonical link: " + url)
 
     if (url.isEmpty) {
-      url = article.doc.select("meta[property=og:url]").attr("abs:content")
+      url = doc.select("meta[property=og:url]").attr("abs:content")
 
       trace(logPrefix + " canonical link meta og: " + url)
       if (url.isEmpty) {
-        url = article.doc.select("meta[name=twitter:url]").attr("abs:content")
+        url = doc.select("meta[name=twitter:url]").attr("abs:content")
 
         trace(logPrefix + " canonical link meta twitter: " + url)
       }
     }
-    if (url.nonEmpty) {
-      val href = url.trim
-      if (href.nonEmpty) href else article.finalUrl
-    } else {
-      article.finalUrl
-    }
+    val href = url.trim
+    if (href.nonEmpty) Some(href) else None
   }
+  /**
+   * if the article has meta canonical link set in the url
+   */
+  def getCanonicalLink(article: Article): String = extractCanonicalLink(article.doc).getOrElse(article.finalUrl)
 
   def getDomain(url: String): String = {
     new URL(url).getHost
@@ -208,7 +211,9 @@ trait ContentExtractor {
     tags.toSet
   }
 
-  def getDateFromURL(url: String): Date = {
+  def extractDateFromURL(url: String): Option[Date] = Option(extractDateFromURLUnsafe(url))
+
+  def extractDateFromURLUnsafe(url: String): Date = {
     val path = new URL(url).getPath
 
     var year: Integer = -1;
@@ -263,14 +268,16 @@ trait ContentExtractor {
     }
 
     // should be converted to use jodatime or something, because java's date is terrible
-    if (year < 0) return null;
+    if (year < 0) return null
     year = year - 1900 // date constructor takes year - 1900
     if (month < 1) return new Date(year, 0, 1)
     month = month - 1 // date constructor dates month in 0 - 11
     if (day < 1) return new Date(year, month, 1)
-    return new Date(year, month, day)
+    new Date(year, month, day)
   }
 
+  def calculateBestNodeBasedOnClustering(article: Article, lang:String): Option[Element] =
+    calculateBestNodeBasedOnClustering(article.doc, lang)
   /**
   * we're going to start looking for where the clusters of paragraphs are. We'll score a cluster based on the number of stopwords
   * and the number of consecutive paragraphs together, which should form the cluster of text that this node is around
@@ -281,10 +288,10 @@ trait ContentExtractor {
   */
 
   //def calculateBestNodeBasedOnClustering(article: Article, language: Language): Option[Element] = {
-  def calculateBestNodeBasedOnClustering(article: Article,
+  def calculateBestNodeBasedOnClustering(document: Document,
                                          lang:String): Option[Element] = {
     trace(logPrefix + "Starting to calculate TopNode")
-    val doc = article.doc.clone
+    val doc = document.clone
     var topNode: Element = null
     val nodesToCheck = Collector.collect(TOP_NODE_TAGS, doc)
     var startingBoost: Double = 1.0
@@ -368,7 +375,7 @@ trait ContentExtractor {
       debug("TopNode score is too small!")
       return None
     }
-    if (topNode == null) None else Some(topNode)
+    Option(topNode)
   }
 
   def printTraceLog(topNode: Element) {
@@ -586,10 +593,10 @@ trait ContentExtractor {
   }
 
   /**
-  * pulls out links we like
-  *
-  * @return
-  */
+   * pulls out links we like
+   *
+   * @return
+   */
   def extractLinks(node: Element): List[Map[String, String]] = {
     val goodLinks = mutable.MutableList[Map[String, String]]()
 
@@ -598,6 +605,20 @@ trait ContentExtractor {
     trace(logPrefix + "extractLinks: Extracted links. Found: " + candidates.size)
 
     goodLinks.toList
+  }
+  /**
+   * pulls out links we like
+   *
+   * @return
+   */
+  def extractLinks1(node: Element): Seq[Link] = {
+    val candidates = node.parent.select("a[href]")
+      .filter(el => el.attr("href") != "#" && !el.attr("abs:href").trim.isEmpty)
+      .map(el => Link(el.text, el.attr("abs:href")))
+
+    trace(logPrefix + "extractLinks: Extracted links. Found: " + candidates.size)
+
+    candidates
   }
 
   def isTableTagAndNoParagraphsExist(e: Element): Boolean = {

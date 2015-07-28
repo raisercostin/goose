@@ -29,5 +29,4 @@ object Language {
 case class Language(lang: String)
 
 case class Configuration(contentExtractor: ContentExtractor = StandardContentExtractor,
-                         additionalDataExtractor: AdditionalDataExtractor = new AdditionalDataExtractor,
                          openGraphDataExtractor: OpenGraphDataExtractor = new OpenGraphDataExtractor)
