@@ -17,18 +17,17 @@
  */
 package com.gravity.goose.extractors
 
+import java.net.URL
+import java.util.{ArrayList, Date}
+
 import com.gravity.goose.Article
 import com.gravity.goose.text._
 import com.gravity.goose.utils.Logging
-import java.net.URL
-import java.util.ArrayList
-import java.util.Date
-import scala.collection.mutable
-import scala.collection.immutable
-import scala.collection.JavaConversions._
-import org.jsoup.nodes.{Attributes, Element, Document}
+import org.jsoup.nodes.{Attributes, Document, Element}
 import org.jsoup.select._
-import com.gravity.goose.Language._
+
+import scala.collection.JavaConversions._
+import scala.collection.{immutable, mutable}
 import scala.math._
 /**
 * Created by Jim Plush
@@ -737,16 +736,13 @@ trait ContentExtractor {
     b
   }
 
-//  private def addSiblings(topNode: Element, language: Language): Element = {
   private def addSiblings(topNode: Element, lang: String): Element = {
 
     trace(logPrefix + "Starting to add siblings")
 
-//    val baselineScoreForSiblingParagraphs: Int = getBaselineScoreForSiblings(topNode, language)
     val baselineScoreForSiblingParagraphs: Int = getBaselineScoreForSiblings(topNode, lang)
     val results = walkSiblings(topNode) {
       currentNode => {
-//        getSiblingContent(currentNode, baselineScoreForSiblingParagraphs, language)
         getSiblingContent(currentNode, baselineScoreForSiblingParagraphs, lang)
 
       }

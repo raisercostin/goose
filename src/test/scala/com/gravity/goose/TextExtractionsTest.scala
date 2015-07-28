@@ -1,13 +1,8 @@
 package com.gravity.goose
 
-import extractors.PublishDateExtractor
-import org.junit.Test
+import com.gravity.goose.utils.FileHelper
 import org.junit.Assert._
-import utils.FileHelper
-import java.text.SimpleDateFormat
-import org.jsoup.select.Selector
-import org.jsoup.nodes.Element
-import java.util.Date
+import org.junit.Test
 
 /**
  * Created by Jim Plush
@@ -23,7 +18,6 @@ class TextExtractionsTest {
 
   @Test
   def cnn1() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("cnn1.txt")
     val url = "http://www.cnn.com/2010/POLITICS/08/13/democrats.social.security/index.html"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
@@ -34,7 +28,6 @@ class TextExtractionsTest {
 
   @Test
   def businessWeek2() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("businessweek2.txt")
     val url: String = "http://www.businessweek.com/technology/here-comes-apples-real-tv-09132011.html"
     val article = TestUtils.getArticle(url, html)
@@ -45,7 +38,6 @@ class TextExtractionsTest {
 
   @Test
   def businessWeek3() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("businessweek3.txt")
     val url: String = "http://www.businessweek.com/management/five-social-media-lessons-for-business-09202011.html"
     val article = TestUtils.getArticle(url, html)
@@ -56,7 +48,6 @@ class TextExtractionsTest {
 
   @Test
   def techcrunch1() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("techcrunch1.txt")
     val url = "http://techcrunch.com/2011/08/13/2005-zuckerberg-didnt-want-to-take-over-the-world/"
     val content = "The Huffington Post has come across this fascinating five-minute interview"
@@ -67,7 +58,6 @@ class TextExtractionsTest {
 
   @Test
   def businessweek1() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("businessweek1.txt")
     val url: String = "http://www.businessweek.com/magazine/content/10_34/b4192066630779.htm"
     val title = "Olivia Munn: Queen of the Uncool"
@@ -78,7 +68,6 @@ class TextExtractionsTest {
 
   @Test
   def foxNews() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("foxnews1.txt")
     val url: String = "http://www.foxnews.com/politics/2010/08/14/russias-nuclear-help-iran-stirs-questions-improved-relations/"
     val content = "Russia's announcement that it will help Iran get nuclear fuel is raising questions"
@@ -89,7 +78,6 @@ class TextExtractionsTest {
 
   @Test
   def aolNews() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("aol1.txt")
     val url: String = "http://www.aolnews.com/nation/article/the-few-the-proud-the-marines-getting-a-makeover/19592478"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
@@ -99,7 +87,6 @@ class TextExtractionsTest {
 
   @Test
   def huffingtonPost2() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("huffpo2.txt")
     val url: String = "http://www.huffingtonpost.com/2011/10/06/alabama-workers-immigration-law_n_997793.html"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
@@ -110,7 +97,6 @@ class TextExtractionsTest {
 
   @Test
   def testHuffingtonPost() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val url: String = "http://www.huffingtonpost.com/2010/08/13/federal-reserve-pursuing_n_681540.html"
     val html = getHtml("huffpo1.txt")
 
@@ -122,23 +108,23 @@ class TextExtractionsTest {
     TestUtils.runArticleAssertions(article = article, expectedTitle = title, expectedStart = content, expectedDescription = description)
 
     val expectedTags = "Federal Open Market Committee" ::
-        "Federal Reserve" ::
-        "Federal Reserve Bank Of Kansas City" ::
-        "Financial Crisis" ::
-        "Financial Reform" ::
-        "Financial Regulation" ::
-        "Financial Regulatory Reform" ::
-        "Fomc" ::
-        "Great Recession" ::
-        "Interest Rates" ::
-        "Kansas City Fed" ::
-        "Monetary Policy" ::
-        "The Financial Fix" ::
-        "Thomas Hoenig" ::
-        "Too Big To Fail" ::
-        "Wall Street Reform" ::
-        "Business News" ::
-        Nil
+      "Federal Reserve" ::
+      "Federal Reserve Bank Of Kansas City" ::
+      "Financial Crisis" ::
+      "Financial Reform" ::
+      "Financial Regulation" ::
+      "Financial Regulatory Reform" ::
+      "Fomc" ::
+      "Great Recession" ::
+      "Interest Rates" ::
+      "Kansas City Fed" ::
+      "Monetary Policy" ::
+      "The Financial Fix" ::
+      "Thomas Hoenig" ::
+      "Too Big To Fail" ::
+      "Wall Street Reform" ::
+      "Business News" ::
+      Nil
     assertNotNull("Tags should not be NULL!", article.tags)
     assertTrue("Tags should not be empty!", article.tags.size > 0)
 
@@ -150,7 +136,6 @@ class TextExtractionsTest {
 
   @Test
   def wallStreetJournal() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("wsj1.txt")
     val url: String = "http://online.wsj.com/article/SB10001424052748704532204575397061414483040.html"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
@@ -160,7 +145,6 @@ class TextExtractionsTest {
 
   @Test
   def usaToday() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("usatoday1.txt")
     val url: String = "http://content.usatoday.com/communities/thehuddle/post/2010/08/brett-favre-practices-set-to-speak-about-return-to-minnesota-vikings/1"
     val article = TestUtils.getArticle(url, rawHTML = html)
@@ -173,25 +157,10 @@ class TextExtractionsTest {
     val url = "http://www.wired.com/playbook/2010/08/stress-hormones-boxing/";
     val html = getHtml("wired1.txt")
     //val fmt = new SimpleDateFormat("yyyy-MM-dd")
-	import com.github.nscala_time.time.Imports._
-	val dateParser = DateTimeFormat.forPattern("yyyy-MM-dd")
+    import com.github.nscala_time.time.Imports._
+    val dateParser = DateTimeFormat.forPattern("yyyy-MM-dd")
     // example of a custom PublishDateExtractor
     implicit val config = new Configuration();
-    config.enableImageFetching = false
-    config.setPublishDateExtractor(new PublishDateExtractor() {
-      @Override
-      def extract(rootElement: Element): DateTime = {
-        // look for this guy: <meta name="DisplayDate" content="2010-08-18" />
-        val elements = Selector.select("meta[name=DisplayDate]", rootElement);
-        if (elements.size() == 0) return null;
-        val metaDisplayDate = elements.get(0);
-        if (metaDisplayDate.hasAttr("content")) {
-          val dateStr = metaDisplayDate.attr("content");
-          return dateParser.parseDateTime(dateStr);
-        }
-        null;
-      }
-    });
 
     val article = TestUtils.getArticle(url, rawHTML = html)
 
@@ -207,7 +176,6 @@ class TextExtractionsTest {
 
   @Test
   def espn() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("espn1.txt")
     val url: String = "http://sports.espn.go.com/espn/commentary/news/story?id=5461430"
     val article = TestUtils.getArticle(url, html)
@@ -218,7 +186,6 @@ class TextExtractionsTest {
 
   @Test
   def engadget() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("engadget1.txt")
     val url: String = "http://www.engadget.com/2010/08/18/verizon-fios-set-top-boxes-getting-a-new-hd-guide-external-stor/"
     val article = TestUtils.getArticle(url, html)
@@ -228,7 +195,6 @@ class TextExtractionsTest {
 
   @Test
   def msn1() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("msn1.txt")
     val expected = getHtml("msn1_result.txt")
     val url: String = "http://lifestyle.msn.com/your-life/your-money-today/article.aspx?cp-documentid=31244150"
@@ -239,7 +205,6 @@ class TextExtractionsTest {
 
   @Test
   def guardian1() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("guardian1.txt")
     val expected = getHtml("guardian1_result.txt")
     val url: String = "http://www.guardian.co.uk/film/2011/nov/18/kristen-wiig-bridesmaids"
@@ -251,7 +216,6 @@ class TextExtractionsTest {
 
   @Test
   def time() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("time1.txt")
     val url: String = "http://www.time.com/time/health/article/0,8599,2011497,00.html"
     val article = TestUtils.getArticle(url, html)
@@ -262,7 +226,6 @@ class TextExtractionsTest {
 
   @Test
   def time2() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("time2.txt")
     val url: String = "http://newsfeed.time.com/2011/08/24/washington-monument-closes-to-repair-earthquake-induced-crack/"
     val article = TestUtils.getArticle(url, html)
@@ -272,7 +235,6 @@ class TextExtractionsTest {
 
   @Test
   def cnet() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("cnet1.txt")
     val url: String = "http://news.cnet.com/8301-30686_3-20014053-266.html?tag=topStories1"
     val article = TestUtils.getArticle(url, html)
@@ -282,7 +244,6 @@ class TextExtractionsTest {
 
   @Test
   def yahoo() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("yahoo1.txt")
     val url: String = "http://news.yahoo.com/apple-says-steve-jobs-resigning-ceo-224628633.html"
     val article = TestUtils.getArticle(url, html)
@@ -292,7 +253,6 @@ class TextExtractionsTest {
 
   @Test
   def politico() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("politico1.txt")
     val url: String = "http://www.politico.com/news/stories/1010/43352.html"
     val article = TestUtils.getArticle(url, html)
@@ -304,7 +264,6 @@ class TextExtractionsTest {
   @Test
   def businessinsider1() {
     val url = "http://www.businessinsider.com/goldman-on-the-fed-announcement-2011-9"
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("businessinsider1.txt")
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(article = article,
@@ -314,7 +273,6 @@ class TextExtractionsTest {
   @Test
   def businessinsider2() {
     val url = "http://www.businessinsider.com/goldman-on-the-fed-announcement-2011-9"
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("businessinsider2.txt")
     val article = TestUtils.getArticle(url, html)
 
@@ -326,7 +284,6 @@ class TextExtractionsTest {
   @Test
   def cnbc1() {
     val url = "http://www.cnbc.com/id/44613978"
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("cnbc1.txt")
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(article = article,
@@ -341,7 +298,6 @@ class TextExtractionsTest {
   */
   @Test
   def issue24() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("issue_24.txt")
     val expected = getHtml("issue_24_result.txt")
     val url: String = "http://danielspicar.github.com/goose-bug.html"
@@ -351,7 +307,6 @@ class TextExtractionsTest {
 
   @Test
   def issue25() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("issue_25.txt")
     val url: String = "http://www.accountancyage.com/aa/analysis/2111729/institutes-ifrs-bang"
     val article = TestUtils.getArticle(url, html)
@@ -361,7 +316,6 @@ class TextExtractionsTest {
 
   @Test
   def issue28() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("issue_28.txt")
     val url: String = "http://www.telegraph.co.uk/foodanddrink/foodanddrinknews/8808120/Worlds-hottest-chilli-contest-leaves-two-in-hospital.html"
     val article = TestUtils.getArticle(url, html)
@@ -373,7 +327,6 @@ class TextExtractionsTest {
   @Test
   def issue32() {
     // this link is an example of web devs putting content not in paragraphs but embedding them in span tags with br's
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("issue_32.txt")
     val url: String = "http://www.tulsaworld.com/site/articlepath.aspx?articleid=20111118_61_A16_Opposi344152&rss_lnk=7"
     val article = TestUtils.getArticle(url, html)
@@ -385,7 +338,6 @@ class TextExtractionsTest {
   @Test
   def bug1() {
     // html is not parsed properly
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     val html = getHtml("bug1.html")
     val url: String = "http://www.tulsaworld.com/site/articlepath.aspx?articleid=20111118_61_A16_Opposi344152&rss_lnk=7"
     val article = TestUtils.getArticle(url, html)

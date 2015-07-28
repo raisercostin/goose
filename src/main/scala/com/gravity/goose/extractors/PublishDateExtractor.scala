@@ -17,7 +17,9 @@
  */
 package com.gravity.goose.extractors
 
+import org.joda.time.DateTime
 import org.jsoup.nodes.Element
+import scala.collection.JavaConverters._
 import com.github.nscala_time.time.Imports._
 
 /**
@@ -29,15 +31,23 @@ import com.github.nscala_time.time.Imports._
  * Date: 5/19/11
  * Time: 2:50 PM
  */
-abstract class PublishDateExtractor extends Extractor[DateTime] {
+object PublishDateExtractor extends Extractor[DateTime] {
+
   /**
-  * Intended to search the DOM and identify the {@link DateTime} of when this article was published.
-  * <p>This will be called by the {@link com.jimplush.goose.ContentExtractor#extractContent(String)} method and will be passed to {@link com.jimplush.goose.Article#setPublishDate(org.joda.time.DateTime)}</p>
-  *
-  * @param rootElement passed in from the {@link com.jimplush.goose.ContentExtractor} after the article has been parsed
-  * @return {@link DateTime} of when this particular article was published or <code>null</code> if no date could be found.
-  */
-  def extract(rootElement: Element): DateTime
+   * Intended to search the DOM and identify the {@link DateTime} of when this article was published.
+   * <p>This will be called by the {@link com.jimplush.goose.ContentExtractor#extractContent(String)} method and will be passed to {@link com.jimplush.goose.Article#setPublishDate(org.joda.time.DateTime)}</p>
+   *
+   * @param rootElement passed in from the {@link com.jimplush.goose.ContentExtractor} after the article has been parsed
+   * @return {@link DateTime} of when this particular article was published or <code>null</code> if no date could be found.
+   */
+  def extract(rootElement: Element): DateTime = {
+    // Try to retrieve publish time from open graph data
+    val dateParser = org.joda.time.format.ISODateTimeFormat.dateTimeParser
+    for (el <- rootElement.select("meta[property=article:published_time]").asScala)
+      return dateParser.parseDateTime(el.attr("content"))
+    null
+  }
+
 }
 
 

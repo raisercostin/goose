@@ -24,19 +24,16 @@ package com.gravity.goose.text
  * Date: 8/16/11
  */
 
-import com.gravity.goose.utils.FileHelper
-import com.gravity.goose.Language._
-import com.chenlb.mmseg4j.ComplexSeg
-import com.chenlb.mmseg4j.Dictionary
-import com.chenlb.mmseg4j.MMSeg
-import com.chenlb.mmseg4j.Seg
-import com.chenlb.mmseg4j.Word
 import java.io.StringReader
-import scala.collection.JavaConversions._
-import java.util.HashMap
-import scala.collection.Set
-import java.util.Map
+import java.util.{HashMap, Map}
+
+import com.chenlb.mmseg4j.{ComplexSeg, Dictionary, MMSeg}
 import com.gravity.goose.Language
+import com.gravity.goose.Language._
+import com.gravity.goose.utils.FileHelper
+
+import scala.collection.JavaConversions._
+import scala.collection.Set
 
 object StopWords {
 
@@ -117,9 +114,9 @@ if (stopWords.size > 0) {
   }
   
   def  tokenize(line: String): List[String] = {
-    
-    var seg = new ComplexSeg(Dictionary.getInstance());
-    var mmSeg = new MMSeg(new StringReader(line), seg);
+
+    val seg = new ComplexSeg(Dictionary.getInstance());
+    val mmSeg = new MMSeg(new StringReader(line), seg);
     var tokens = List[String]();
     var word = mmSeg.next()
     while (word != null) {

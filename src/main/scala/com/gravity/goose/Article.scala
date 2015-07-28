@@ -18,12 +18,13 @@
 
 package com.gravity.goose
 
-import images.Image
-import org.jsoup.nodes.{ Element, Document }
 import java.util.Date
-import scala.collection._
-import beans.BeanProperty
+
 import com.gravity.goose.opengraph.OpenGraphData
+import org.jsoup.nodes.{Document, Element}
+
+import scala.beans.BeanProperty
+import scala.collection._
 
 /**
  * Created by Jim Plush
@@ -80,18 +81,6 @@ class Article {
    */
   @BeanProperty
   var topNode: Element = null
-
-  /**
-   * holds the top Image object that we think represents this article
-   */
-  @BeanProperty
-  var topImage: Image = new Image
-
-  /**
-   * all article images in the order they were found
-   */
-  @BeanProperty
-  var allImages: List[Image] = Nil
 
   /**
    * holds a set of tags that may have been in the artcle, these are not meta keywords
@@ -179,8 +168,8 @@ class Article {
 //  additionalData=$additionalData
 //}"""
   def fields = {
-    import reflect.runtime.universe._
     import reflect.runtime.currentMirror
+    import reflect.runtime.universe._
 
     val r = currentMirror.reflect(this)
     r.symbol.typeSignature.members.toStream

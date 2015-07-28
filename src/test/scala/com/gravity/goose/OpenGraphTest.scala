@@ -7,7 +7,6 @@ class OpenGraphTest {
 
   @Test
   def openGraph() {
-    implicit val config = TestUtils.NO_IMAGE_CONFIG
     // og tags for http://www.telegraph.co.uk/foodanddrink/foodanddrinknews/8808120/Worlds-hottest-chilli-contest-leaves-two-in-hospital.html
     /*
 <meta property="og:title" content="World's hottest chilli contest leaves two in hospital - Telegraph" />
