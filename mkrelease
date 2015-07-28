@@ -1,3 +1,0 @@
-#!/bin/bash
-rm release/*.jar
-sbt clean update package-dist

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-sbt 'gen-idea no-classifiers'
