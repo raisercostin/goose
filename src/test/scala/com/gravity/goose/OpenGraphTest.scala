@@ -16,7 +16,7 @@ class OpenGraphTest {
 <meta property="og:type" content="article" />
      */
     val url: String = "http://www.telegraph.co.uk/foodanddrink/foodanddrinknews/8808120/Worlds-hottest-chilli-contest-leaves-two-in-hospital.html"
-    val article = TestUtils.getArticle(url)
+    val article = TestUtils.getPageInfo(url)
     assertEquals("og:description was not as expected!", article.openGraphData.description,
       "A 'world's hottest chilli' competition at a curry restaurant left two people   in hospital.")
     assertEquals("og:title was not as expected!", article.openGraphData.title,

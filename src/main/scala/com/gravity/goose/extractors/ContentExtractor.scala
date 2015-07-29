@@ -53,7 +53,6 @@ trait ContentExtractor {
   val PIPE_SPLITTER: StringSplitter = new StringSplitter("\\|")
   val DASH_SPLITTER: StringSplitter = new StringSplitter(" - ")
   val ARROWS_SPLITTER: StringSplitter = new StringSplitter("»")
-  val COLON_SPLITTER: StringSplitter = new StringSplitter(":")
   val SPACE_SPLITTER: StringSplitter = new StringSplitter(" ")
   val NO_STRINGS = Set.empty[String]
   val A_REL_TAG_SELECTOR: String = "a[rel=tag], a[href*=/tag/]"
@@ -82,17 +81,13 @@ trait ContentExtractor {
         titleText = doTitleSplits(titleText, ARROWS_SPLITTER)
         usedDelimeter = true
       }
-      if (!usedDelimeter && titleText.contains(":")) {
-        titleText = doTitleSplits(titleText, COLON_SPLITTER)
-      }
       // todo do we still need this? thinking not, make it an output formatter config
       //      title = StringEscapeUtils.escapeHtml(titleText)
       title = MOTLEY_REPLACEMENT.replaceAll(titleText)
 
       trace(logPrefix + "Page title is: " + title)
 
-      title
-
+      title.trim
     }
     catch {
       case e: NullPointerException => {

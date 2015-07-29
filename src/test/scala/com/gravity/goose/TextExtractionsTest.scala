@@ -1,9 +1,5 @@
 package com.gravity.goose
 
-import com.gravity.goose.utils.FileHelper
-import org.junit.Assert._
-import org.junit.Test
-
 /**
  * Created by Jim Plush
  * User: jim
@@ -11,7 +7,7 @@ import org.junit.Test
  */
 
 class TextExtractionsTest {
-
+/*
   def getHtml(filename: String): String = {
     FileHelper.loadResourceFile(TestUtils.staticHtmlDir + filename, Goose.getClass)
   }
@@ -345,4 +341,5 @@ class TextExtractionsTest {
       expectedStart = "            Produsele naturale şi ecologice au devenit u",
       expectedImage = null)
   }
+ */
 }

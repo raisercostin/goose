@@ -18,13 +18,13 @@
 
 package com.gravity.goose.outputformatters
 
-import org.jsoup.nodes._
-import org.apache.commons.lang.StringEscapeUtils
-import org.jsoup.select.Elements
 import com.gravity.goose.text.StopWords
-import scala.collection.JavaConversions._
+import org.apache.commons.lang.StringEscapeUtils
+import org.jsoup.nodes._
+import org.jsoup.select.Elements
 import org.slf4j.Logger
-import com.gravity.goose.Language._
+
+import scala.collection.JavaConversions._
 
 /**
 * Created by Jim Plush

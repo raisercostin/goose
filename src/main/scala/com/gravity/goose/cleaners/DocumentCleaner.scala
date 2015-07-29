@@ -40,10 +40,11 @@ trait DocumentCleaner {
   import DocumentCleaner._
 
 
-  def clean(article: Article): Document = {
+  def cleanArticle(article: Article): Document = clean(article.doc)
+  def clean(doc: Document): Document = {
 
     trace("Starting cleaning phase with DefaultDocumentCleaner")
-    var docToClean: Document = article.doc.clone
+    var docToClean: Document = doc.clone
     trace("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BEFORE CLEAN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     trace(docToClean.html)
     trace("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BEFORE CLEAN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")

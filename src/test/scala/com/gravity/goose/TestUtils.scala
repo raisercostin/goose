@@ -1,7 +1,11 @@
 package com.gravity.goose
 
+import java.net.URL
+
+import com.google.common.base.Charsets
+import com.google.common.io.Resources
+import com.intenthq.gander.{Gander, PageInfo}
 import junit.framework.Assert._
-import org.jsoup.nodes.Element
 
 /**
  * Created by Jim Plush
@@ -12,47 +16,25 @@ import org.jsoup.nodes.Element
 object TestUtils {
 
   val staticHtmlDir = "/com/gravity/goose/statichtml/"
-  private val NL = '\n';
-  private val TAB = "\t\t";
-  val articleReport = new StringBuilder("=======================::. ARTICLE REPORT .::======================\n");
-
-
-  object additionalExt extends AdditionalDataExtractor {
-    override def extract(rootElement: Element) = {
-      println()
-      println("ADDITIONAL DATA EXTRACTOR CALLED")
-      println()
-      Map("test" -> "success")
-    }
-  }
 
   /**
   * returns an article object from a crawl
   */
-  def getArticle(url: String, rawHTML: String = null): Article = {
+  def getPageInfo(url: String): PageInfo = {
     implicit val config: Configuration = new Configuration()
-    Goose.extractContent(url, rawHTML)
+    val rawHTML = Resources.toString(new URL(url), Charsets.UTF_8)
+    Gander.extract(rawHTML).get
   }
 
-  def runArticleAssertions(article: Article, expectedTitle: String = null, expectedStart: String = null, expectedHtmlStart: String = null, expectedImage: String = null, expectedImages: List[String] = null, expectedDescription: String = null, expectedKeywords: String = null): Unit = {
-    articleReport.append("URL:            ").append(TAB).append(article.finalUrl).append(NL)
-    articleReport.append("TITLE:          ").append(TAB).append(article.title).append(NL)
-    articleReport.append("CONTENT:        ").append(TAB).append(article.cleanedArticleText.replace("\n", "    ")).append(NL)
-    articleReport.append("HTML CONTENT:   ").append(TAB).append(article.htmlArticle).append(NL)
-    articleReport.append("METAKW:         ").append(TAB).append(article.metaKeywords).append(NL)
-    articleReport.append("METADESC:       ").append(TAB).append(article.metaDescription).append(NL)
-    articleReport.append("DOMAIN:         ").append(TAB).append(article.domain).append(NL)
-    articleReport.append("LINKHASH:       ").append(TAB).append(article.linkhash).append(NL)
-    articleReport.append("MOVIES:         ").append(TAB).append(article.movies).append(NL)
-    articleReport.append("TAGS:           ").append(TAB).append(article.tags).append(NL)
+  def runArticleAssertions(pageInfo: PageInfo,
+                           expectedTitle: Option[String] = None,
+                           expectedStart: Option[String] = None,
+                           expectedDescription: Option[String] = None,
+                           expectedKeywords: Option[String] = None): Unit = {
 
-    assertNotNull("Resulting article was NULL!", article)
+    expectedTitle.foreach(assertEquals("Expected title was not returned!", _, pageInfo.title))
 
-    if (expectedTitle != null) {
-      val title: String = article.title
-      assertNotNull("Title was NULL!", title)
-      assertEquals("Expected title was not returned!", expectedTitle, title)
-    }
+/*
     if (expectedStart != null) {
       val articleText: String = article.cleanedArticleText
       assertNotNull("Resulting article text was NULL!", articleText)
@@ -77,9 +59,7 @@ object TestUtils {
       assertNotNull("Meta Keywords was NULL!", keywords)
       assertEquals("Meta Keywords was not as expected!", expectedKeywords, keywords)
     }
+    */
   }
 
-  def printReport() {
-    println(articleReport)
-  }
 }

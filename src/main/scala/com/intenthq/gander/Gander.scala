@@ -3,6 +3,7 @@ package com.intenthq.gander
 import java.util.Date
 
 import com.gravity.goose.Configuration
+import com.gravity.goose.cleaners.StandardDocumentCleaner
 import com.gravity.goose.opengraph.OpenGraphData
 import com.gravity.goose.outputformatters.StandardOutputFormatter
 import org.joda.time.DateTime
@@ -26,8 +27,8 @@ case class PageInfo(title: String,
 
 object Gander {
 
-  def extract(html: String, lang: String)(implicit config: Configuration): Option[PageInfo] =
-    Try(Jsoup.parse(html)).toOption.flatMap { doc =>
+  def extract(html: String, lang: String = "all")(implicit config: Configuration): Option[PageInfo] =
+    Try(Jsoup.parse(html)).toOption.map { doc =>
       val extractor = config.contentExtractor
       val canonicalLink = extractor.extractCanonicalLink(doc)
       val publishDate = extractDate(doc).map(_.toDate).orElse(canonicalLink.flatMap(extractor.extractDateFromURL))
@@ -39,10 +40,14 @@ object Gander {
                           publishDate = publishDate,
                           openGraphData = config.openGraphDataExtractor.extract(doc)
       )
-      extractor.calculateBestNodeBasedOnClustering(doc, lang).map { node =>
+
+      val cleanedDoc = new StandardDocumentCleaner().clean(doc)
+      extractor.calculateBestNodeBasedOnClustering(cleanedDoc, lang).map { node =>
+        //some mutability beauty
+        extractor.postExtractionCleanup(node, lang)
         info.copy(cleanedText = Some(StandardOutputFormatter.getFormattedText(node, lang)),
                   links = extractor.extractLinks1(node))
-      }
+      }.getOrElse(info)
     }
 
 
