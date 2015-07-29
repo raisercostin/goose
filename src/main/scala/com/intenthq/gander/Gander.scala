@@ -4,7 +4,6 @@ import java.util.Date
 
 import com.gravity.goose.cleaners.DocumentCleaner
 import com.gravity.goose.extractors.ContentExtractor
-import com.gravity.goose.outputformatters.StandardOutputFormatter
 import com.intenthq.gander.opengraph.OpenGraphData
 import org.joda.time.DateTime
 import org.jsoup.Jsoup
@@ -44,7 +43,7 @@ object Gander {
       ContentExtractor.calculateBestNodeBasedOnClustering(cleanedDoc, lang).map { node =>
         //some mutability beauty
         ContentExtractor.postExtractionCleanup(node, lang)
-        info.copy(cleanedText = Some(StandardOutputFormatter.getFormattedText(node, lang)),
+        info.copy(cleanedText = Some(node.text()),
                   links = ContentExtractor.extractLinks1(node))
       }.getOrElse(info)
     }
