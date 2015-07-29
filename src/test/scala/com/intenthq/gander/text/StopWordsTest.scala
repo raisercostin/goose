@@ -1,6 +1,5 @@
 package com.intenthq.gander.text
 
-import com.gravity.goose.text.StopWords
 import org.specs2.mutable.Specification
 
 class StopWordsTest extends Specification {

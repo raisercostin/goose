@@ -18,7 +18,7 @@
 
 package com.gravity.goose.outputformatters
 
-import com.gravity.goose.text.StopWords
+import com.intenthq.gander.text.StopWords
 import org.apache.commons.lang.StringEscapeUtils
 import org.jsoup.nodes._
 import org.jsoup.select.Elements
@@ -219,7 +219,7 @@ trait OutputFormatter {
 
       for (el <- paragraphs) {
         try {
-          val stopWords = StopWords.getStopWordCount(el.text, lang)
+          val stopWords = StopWords.stopWordCount(el.text, lang)
           if (el.text.size < 8 && stopWords.stopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.stopWordCount, el.text()))
             el.remove()

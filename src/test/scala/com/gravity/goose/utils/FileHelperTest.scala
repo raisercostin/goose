@@ -1,8 +1,8 @@
 package com.gravity.goose.utils
 
+import com.intenthq.gander.text.StopWords
 import org.junit.Test
 import org.junit.Assert._
-import com.gravity.goose.text.StopWords
 
 /**
 * Created by Jim Plush
