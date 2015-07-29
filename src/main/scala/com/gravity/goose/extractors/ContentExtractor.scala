@@ -19,8 +19,6 @@ package com.gravity.goose.extractors
 
 import java.net.URL
 import java.util.{ArrayList, Date}
-
-import com.gravity.goose.Article
 import com.gravity.goose.text._
 import com.gravity.goose.utils.Logging
 import com.intenthq.gander.Link
@@ -37,13 +35,6 @@ import scala.math._
 */
 object ContentExtractor extends Logging {
   val logPrefix = "ContentExtractor: "
-}
-
-trait ContentExtractor {
-
-  import ContentExtractor._
-
-  def getLogger() = logger
 
   // PRIVATE PROPERTIES BELOW
 
@@ -57,8 +48,6 @@ trait ContentExtractor {
   val NO_STRINGS = Set.empty[String]
   val A_REL_TAG_SELECTOR: String = "a[rel=tag], a[href*=/tag/]"
   val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre", "strong", "li", "code"))
-
-  def getTitle(article: Article): String = extractTitle(article.doc)
 
   def extractTitle(doc: Document): String = {
     var title: String = string.empty
@@ -134,7 +123,6 @@ trait ContentExtractor {
     if (string.isNullOrEmpty(content)) string.empty else content.trim
   }
 
-  def getMetaDescription(article: Article): String = extractMetaDescription(article.doc)
   /**
   * if the article has meta description set in the source, use that
   */
@@ -157,10 +145,7 @@ trait ContentExtractor {
   /**
   * if the article has meta keywords set in the source, use that
   */
-  def getMetaKeywords(article: Article): String = extractMetaKeywords(article.doc)
-
   def extractMetaKeywords(doc: Document): String = getMetaContent(doc, "meta[name=keywords]")
-
 
   /**
    * if the article has meta canonical link set in the url
@@ -182,28 +167,6 @@ trait ContentExtractor {
     }
     val href = url.trim
     if (href.nonEmpty) Some(href) else None
-  }
-  /**
-   * if the article has meta canonical link set in the url
-   */
-  def getCanonicalLink(article: Article): String = extractCanonicalLink(article.doc).getOrElse(article.finalUrl)
-
-  def getDomain(url: String): String = {
-    new URL(url).getHost
-  }
-
-  def extractTags(article: Article): Set[String] = {
-    val node = article.doc
-    if (node.children.size == 0) return NO_STRINGS
-    val elements: Elements = Selector.select(A_REL_TAG_SELECTOR, node)
-    if (elements.size == 0) return NO_STRINGS
-    val tags = mutable.HashSet[String]()
-
-    for (el <- elements) {
-      var tag: String = el.text
-      if (!string.isNullOrEmpty(tag)) tags += tag
-    }
-    tags.toSet
   }
 
   def extractDateFromURL(url: String): Option[Date] = Option(extractDateFromURLUnsafe(url))
@@ -271,8 +234,6 @@ trait ContentExtractor {
     new Date(year, month, day)
   }
 
-  def calculateBestNodeBasedOnClustering(article: Article, lang:String): Option[Element] =
-    calculateBestNodeBasedOnClustering(article.doc, lang)
   /**
   * we're going to start looking for where the clusters of paragraphs are. We'll score a cluster based on the number of stopwords
   * and the number of consecutive paragraphs together, which should form the cluster of text that this node is around
@@ -281,8 +242,6 @@ trait ContentExtractor {
   * // todo refactor this long method
   * @return
   */
-
-  //def calculateBestNodeBasedOnClustering(article: Article, language: Language): Option[Element] = {
   def calculateBestNodeBasedOnClustering(document: Document,
                                          lang:String): Option[Element] = {
     trace(logPrefix + "Starting to calculate TopNode")
@@ -296,7 +255,6 @@ trait ContentExtractor {
     val nodesWithText = mutable.Buffer[Element]()
     for (node <- nodesToCheck) {
       val nodeText: String = node.text
-//      val wordStats: WordStats = StopWords.getStopWordCount(nodeText, language)
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText, lang)
       val highLinkDensity: Boolean = isHighLinkDensity(node)
       trace("Candidate: " + node.tagName() + " score: " + wordStats + " d:" + highLinkDensity + " text:" + nodeText)
@@ -312,7 +270,6 @@ trait ContentExtractor {
 
     for (node <- nodesWithText) {
       var boostScore: Float = 0
-//      if (isOkToBoost(node, language)) {
       if (isOkToBoost(node, lang)) {
         if (cnt >= 0) {
           boostScore = ((1.0 / startingBoost) * 50).asInstanceOf[Float]
@@ -333,7 +290,6 @@ trait ContentExtractor {
       trace(logPrefix + "Location Boost Score: " + boostScore + " on interation: " + i + " tag='"+ node.tagName +"' id='" + node.parent.id + "' class='" + node.parent.attr("class"))
 
       val nodeText: String = node.text
-//      val wordStats: WordStats = StopWords.getStopWordCount(nodeText, language)
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText, lang)
       val upscore: Int = (wordStats.getStopWordCount + boostScore).asInstanceOf[Int]
       updateScore(node.parent, upscore)
@@ -394,7 +350,6 @@ trait ContentExtractor {
   * @param node
   * @return
   */
-//  private def isOkToBoost(node: Element, language: Language): Boolean = {
   private def isOkToBoost(node: Element, lang: String): Boolean = {
     val para = "p"
     var stepsAway: Int = 0
@@ -409,7 +364,6 @@ trait ContentExtractor {
             return false
           }
           val paraText: String = currentNode.text
-//          val wordStats: WordStats = StopWords.getStopWordCount(paraText, language)
           val wordStats: WordStats = StopWords.getStopWordCount(paraText, lang)
           if (wordStats.getStopWordCount > minimumStopWordCount) {
             trace(logPrefix + "We're gonna boost this node, seems contenty " + debugNode(node))

@@ -17,16 +17,17 @@
  */
 package com.gravity.goose.cleaners
 
-import com.gravity.goose.utils.Logging
 import java.util.regex.{Matcher, Pattern}
-import org.jsoup.nodes.{TextNode, Node, Element, Document}
-import com.gravity.goose.text.ReplaceSequence
-import scala.collection.JavaConversions._
-import com.gravity.goose.Article
-import collection.mutable.ListBuffer
-import org.jsoup.select.{TagsEvaluator, Collector, Elements}
 
-trait DocumentCleaner {
+import com.gravity.goose.text.ReplaceSequence
+import com.gravity.goose.utils.Logging
+import org.jsoup.nodes.{Document, Element, Node, TextNode}
+import org.jsoup.select.{Collector, Elements, TagsEvaluator}
+
+import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
+
+object DocumentCleaner extends Logging {
 
   /**
   * User: Jim Plush
@@ -37,10 +38,6 @@ trait DocumentCleaner {
   * other things that are known to not be content related.
   */
 
-  import DocumentCleaner._
-
-
-  def cleanArticle(article: Article): Document = clean(article.doc)
   def clean(doc: Document): Document = {
 
     trace("Starting cleaning phase with DefaultDocumentCleaner")
@@ -389,21 +386,13 @@ trait DocumentCleaner {
   }
 
 
-}
-
-
-object DocumentCleaner extends Logging {
-  var sb: StringBuilder = new StringBuilder
-
-  // create negative elements
-  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment(?!ed)|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|scroll(?!able)|shoutbox|sponsor")
-  sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip")
-  sb.append("|communitypromo|promo_holder|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text")
   /**
   * this regex is used to remove undesirable nodes from our doc
   * indicate that something maybe isn't content but more of a comment, footer or some other undesirable node
   */
-  val regExRemoveNodes = sb.toString()
+  val regExRemoveNodes = "^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment(?!ed)|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|scroll(?!able)|shoutbox|sponsor" +
+    "|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip" +
+    "|communitypromo|promo_holder|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text"
   val queryNaughtyIDs = "[id~=(" + regExRemoveNodes + ")]"
   val queryNaughtyClasses = "[class~=(" + regExRemoveNodes + ")]"
   val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"

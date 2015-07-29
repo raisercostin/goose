@@ -18,8 +18,6 @@
 
 package com.gravity.goose
 
-import com.gravity.goose.extractors._
-
 object Language {
   object English extends Language("en")
   object Chinese extends Language("zh")
@@ -27,6 +25,3 @@ object Language {
   object Arabic extends Language("ar")
 }
 case class Language(lang: String)
-
-case class Configuration(contentExtractor: ContentExtractor = StandardContentExtractor,
-                         openGraphDataExtractor: OpenGraphDataExtractor = new OpenGraphDataExtractor)

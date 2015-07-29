@@ -2,8 +2,8 @@ package com.intenthq.gander
 
 import java.util.Date
 
-import com.gravity.goose.Configuration
-import com.gravity.goose.cleaners.StandardDocumentCleaner
+import com.gravity.goose.cleaners.DocumentCleaner
+import com.gravity.goose.extractors.{ContentExtractor, OpenGraphDataExtractor}
 import com.gravity.goose.opengraph.OpenGraphData
 import com.gravity.goose.outputformatters.StandardOutputFormatter
 import org.joda.time.DateTime
@@ -27,26 +27,25 @@ case class PageInfo(title: String,
 
 object Gander {
 
-  def extract(html: String, lang: String = "all")(implicit config: Configuration): Option[PageInfo] =
+  def extract(html: String, lang: String = "all"): Option[PageInfo] =
     Try(Jsoup.parse(html)).toOption.map { doc =>
-      val extractor = config.contentExtractor
-      val canonicalLink = extractor.extractCanonicalLink(doc)
-      val publishDate = extractDate(doc).map(_.toDate).orElse(canonicalLink.flatMap(extractor.extractDateFromURL))
+      val canonicalLink = ContentExtractor.extractCanonicalLink(doc)
+      val publishDate = extractDate(doc).map(_.toDate).orElse(canonicalLink.flatMap(ContentExtractor.extractDateFromURL))
 
-      val info = PageInfo(title = extractor.extractTitle(doc),
-                          metaDescription = extractor.extractMetaDescription(doc),
-                          metaKeywords = extractor.extractMetaKeywords(doc),
+      val info = PageInfo(title = ContentExtractor.extractTitle(doc),
+                          metaDescription = ContentExtractor.extractMetaDescription(doc),
+                          metaKeywords = ContentExtractor.extractMetaKeywords(doc),
                           canonicalLink = canonicalLink,
                           publishDate = publishDate,
-                          openGraphData = config.openGraphDataExtractor.extract(doc)
+                          openGraphData = OpenGraphDataExtractor.extract(doc)
       )
 
-      val cleanedDoc = new StandardDocumentCleaner().clean(doc)
-      extractor.calculateBestNodeBasedOnClustering(cleanedDoc, lang).map { node =>
+      val cleanedDoc = DocumentCleaner.clean(doc)
+      ContentExtractor.calculateBestNodeBasedOnClustering(cleanedDoc, lang).map { node =>
         //some mutability beauty
-        extractor.postExtractionCleanup(node, lang)
+        ContentExtractor.postExtractionCleanup(node, lang)
         info.copy(cleanedText = Some(StandardOutputFormatter.getFormattedText(node, lang)),
-                  links = extractor.extractLinks1(node))
+                  links = ContentExtractor.extractLinks1(node))
       }.getOrElse(info)
     }
 

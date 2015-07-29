@@ -5,14 +5,12 @@ import java.nio.charset.Charset
 
 import com.google.common.base.Charsets
 import com.google.common.io.Resources
-import com.gravity.goose.Configuration
 import org.joda.time.DateTime
 import org.specs2.mutable.Specification
 
 class GanderIT extends Specification {
 
   def extract(url: String, charset: Charset = Charsets.UTF_8): PageInfo = {
-    implicit val config: Configuration = new Configuration()
     val rawHTML = Resources.toString(new URL(url), charset)
     Gander.extract(rawHTML).get
   }

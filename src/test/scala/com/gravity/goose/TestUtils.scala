@@ -21,7 +21,6 @@ object TestUtils {
   * returns an article object from a crawl
   */
   def getPageInfo(url: String): PageInfo = {
-    implicit val config: Configuration = new Configuration()
     val rawHTML = Resources.toString(new URL(url), Charsets.UTF_8)
     Gander.extract(rawHTML).get
   }

@@ -21,7 +21,7 @@ import scala.collection.JavaConversions._
 import com.gravity.goose.opengraph.OpenGraphData
 import org.joda.time.format.ISODateTimeFormat
 
-class OpenGraphDataExtractor extends Extractor[OpenGraphData] {
+object OpenGraphDataExtractor extends Extractor[OpenGraphData] {
 
   def extract(rootElement: Element): OpenGraphData = {
     val openGraphData: OpenGraphData = new OpenGraphData
