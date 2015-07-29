@@ -19,8 +19,8 @@ package com.gravity.goose.cleaners
 
 import java.util.regex.{Matcher, Pattern}
 
-import com.gravity.goose.text.ReplaceSequence
 import com.gravity.goose.utils.Logging
+import com.intenthq.gander.text.ReplaceSequence
 import org.jsoup.nodes.{Document, Element, Node, TextNode}
 import org.jsoup.select.{Collector, Elements, TagsEvaluator}
 
@@ -396,7 +396,7 @@ object DocumentCleaner extends Logging {
   val queryNaughtyIDs = "[id~=(" + regExRemoveNodes + ")]"
   val queryNaughtyClasses = "[class~=(" + regExRemoveNodes + ")]"
   val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"
-  val tabsAndNewLinesReplacements = ReplaceSequence.create("\n", "\n\n").append("\t").append("^\\s+$")
+  val tabsAndNewLinesReplacements = ReplaceSequence("\n", "\n\n").append("\t").append("^\\s+$")
   /**
   * regex to detect if there are block level elements inside of a div element
   */

@@ -4,14 +4,12 @@ import java.io.StringReader
 import com.chenlb.mmseg4j.{ComplexSeg, Dictionary, MMSeg}
 import com.gravity.goose.Language
 import com.gravity.goose.Language.Chinese
-import com.gravity.goose.text.StringReplacement
-import com.gravity.goose.text.string
 import com.gravity.goose.utils.FileHelper
 import scala.collection.mutable
 
 object StopWords {
   // the confusing pattern below is basically just match any non-word character excluding white-space.
-  private val PUNCTUATION: StringReplacement = StringReplacement.compile("[^\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}\\p{Pc}\\s]", string.empty)
+  private val PUNCTUATION: StringReplacement = StringReplacement("[^\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}\\p{Pc}\\s]", "")
 
   private val stopWordsMap = mutable.Map.empty[String, Set[String]]
 
@@ -31,19 +29,16 @@ object StopWords {
   def candidateWords(strippedInput: String, language: String): Array[String] =
     Language(language) match {
       case Chinese => tokenize(strippedInput).toArray
-      case _ => string.SPACE_SPLITTER.split(strippedInput)
+      case _ => strippedInput.split(" ")
     }
 
-  def stopWordCount(content: String, lang: String = "en"): WordStats =
-    if (string.isNullOrEmpty(content))
-      WordStats(List.empty, 0)
-    else {
-      val strippedInput = removePunctuation(content)
-      val candidates = candidateWords(strippedInput, lang)
-      val stop = stopWords(lang)
-      val overlappingStopWords = candidates.map(_.toLowerCase).filter(stop.contains)
-      WordStats(overlappingStopWords.toList, candidates.length)
-    }
+  def stopWordCount(content: String, lang: String = "en"): WordStats = {
+    val strippedInput = removePunctuation(content)
+    val candidates = candidateWords(strippedInput, lang)
+    val stop = stopWords(lang)
+    val overlappingStopWords = candidates.map(_.toLowerCase).filter(stop.contains)
+    WordStats(overlappingStopWords.toList, candidates.length)
+  }
 
   def tokenize(line: String): List[String] = {
     val seg = new ComplexSeg(Dictionary.getInstance())

@@ -19,10 +19,9 @@ package com.gravity.goose.extractors
 
 import java.net.URL
 import java.util.{ArrayList, Date}
-import com.gravity.goose.text._
 import com.gravity.goose.utils.Logging
 import com.intenthq.gander.Link
-import com.intenthq.gander.text.{StopWords, WordStats}
+import com.intenthq.gander.text.{ReplaceSequence, StringReplacement, StopWords, WordStats}
 import org.jsoup.nodes.{Attributes, Document, Element}
 import org.jsoup.select._
 
@@ -37,11 +36,15 @@ import scala.math._
 object ContentExtractor extends Logging {
   val logPrefix = "ContentExtractor: "
 
+  class StringSplitter(pattern: String) {
+    def split(input: String): Array[String] = input.split(pattern)
+  }
+
   // PRIVATE PROPERTIES BELOW
 
-  val MOTLEY_REPLACEMENT: StringReplacement = StringReplacement.compile("&#65533;", string.empty)
-  val ESCAPED_FRAGMENT_REPLACEMENT: StringReplacement = StringReplacement.compile("#!", "?_escaped_fragment_=")
-  val TITLE_REPLACEMENTS: ReplaceSequence = ReplaceSequence.create("&raquo;").append("»")
+  val MOTLEY_REPLACEMENT: StringReplacement = StringReplacement("&#65533;", "")
+  val ESCAPED_FRAGMENT_REPLACEMENT: StringReplacement = StringReplacement("#!", "?_escaped_fragment_=")
+  val TITLE_REPLACEMENTS: ReplaceSequence = ReplaceSequence("&raquo;").append("»")
   val PIPE_SPLITTER: StringSplitter = new StringSplitter("\\|")
   val DASH_SPLITTER: StringSplitter = new StringSplitter(" - ")
   val ARROWS_SPLITTER: StringSplitter = new StringSplitter("»")
@@ -51,13 +54,13 @@ object ContentExtractor extends Logging {
   val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre", "strong", "li", "code"))
 
   def extractTitle(doc: Document): String = {
-    var title: String = string.empty
+    var title: String = ""
 
     try {
       val titleElem: Elements = doc.getElementsByTag("title")
-      if (titleElem == null || titleElem.isEmpty) return string.empty
+      if (titleElem == null || titleElem.isEmpty) return ""
       var titleText: String = titleElem.first.text
-      if (string.isNullOrEmpty(titleText)) return string.empty
+      if (titleText.isEmpty) return ""
       var usedDelimeter: Boolean = false
       if (titleText.contains("|")) {
         titleText = doTitleSplits(titleText, PIPE_SPLITTER)
@@ -82,7 +85,7 @@ object ContentExtractor extends Logging {
     catch {
       case e: NullPointerException => {
         warn(e.toString)
-        string.empty
+        ""
       }
     }
 
@@ -117,11 +120,11 @@ object ContentExtractor extends Logging {
 
   private def getMetaContent(doc: Document, metaName: String): String = {
     val meta: Elements = doc.select(metaName)
-    var content: String = null
+    var content: String = ""
     if (meta.size > 0) {
       content = meta.first.attr("content")
     }
-    if (string.isNullOrEmpty(content)) string.empty else content.trim
+    content.trim
   }
 
   /**
@@ -135,12 +138,7 @@ object ContentExtractor extends Logging {
         desc = doc.select("meta[name=twitter:description]").attr("content")
       }
     }
-
-    if (desc.nonEmpty) {
-      desc.trim
-    } else {
-      string.empty
-    }
+    desc.trim
   }
 
   /**
@@ -434,7 +432,7 @@ object ContentExtractor extends Logging {
   private def getGravityScoreFromNode(node: Element): Option[Int] = {
     try {
       val grvScoreString: String = node.attr("gravityScore")
-      if (string.isNullOrEmpty(grvScoreString)) return None
+      if (grvScoreString.isEmpty) return None
       Some(Integer.parseInt(grvScoreString))
     } catch {
       case e: Exception => None
@@ -452,7 +450,7 @@ object ContentExtractor extends Logging {
     var currentScore: Int = 0
     try {
       val scoreString: String = node.attr("gravityScore")
-      currentScore = if (string.isNullOrEmpty(scoreString)) 0 else Integer.parseInt(scoreString)
+      currentScore = if (scoreString.isEmpty) 0 else Integer.parseInt(scoreString)
     }
     catch {
       case e: NumberFormatException => {
@@ -473,7 +471,7 @@ object ContentExtractor extends Logging {
     var currentScore: Int = 0
     try {
       val countString: String = node.attr("gravityNodes")
-      currentScore = if (string.isNullOrEmpty(countString)) 0 else Integer.parseInt(countString)
+      currentScore = if (countString.isEmpty) 0 else Integer.parseInt(countString)
     }
     catch {
       case e: NumberFormatException => {
