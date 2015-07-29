@@ -1,4 +1,4 @@
-#Gander
+#Gander [![Circle CI](https://circleci.com/gh/intenthq/gander.svg?style=svg)](https://circleci.com/gh/intenthq/gander)
 
 Gander is a scala library that extract content from webpages.
  

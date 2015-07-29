@@ -12,6 +12,8 @@ licenses += "Apache2" -> url("http://www.apache.org/licenses/")
 
 scalaVersion := "2.11.6"
 
+resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
 Defaults.itSettings
 
 testOptions in Test += Tests.Argument("-oF")
@@ -40,8 +42,6 @@ libraryDependencies ++= Seq(
   "junit" % "junit" % "4.11" % Test,
   "org.specs2" %% "specs2-core" % "3.6" % "it,test"
 )
-
-parallelExecution in Test := false
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 

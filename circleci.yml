@@ -1,0 +1,3 @@
+test:
+  override:
+    - sbt test it:test-only
