@@ -5,6 +5,7 @@ import java.nio.charset.Charset
 
 import com.google.common.base.Charsets
 import com.google.common.io.Resources
+import com.intenthq.gander.opengraph.OpenGraphData
 import org.joda.time.DateTime
 import org.specs2.mutable.Specification
 
@@ -39,7 +40,7 @@ class GanderIT extends Specification {
     val url = "http://internacional.elpais.com/internacional/2015/07/28/actualidad/1438076596_960360.html"
     val content = "Los aliados de la OTAN ofrecieron este martes respaldo político a Turquía en su ofensiva contra el Estado Islámico tras una reunión convocada de urgencia por el Gobierno de Ankara."
     val title = "La OTAN apoya con cautela la ofensiva turca contra el yihadismo"
-    val metaDescription = "La Alianza se ha reunido este martes con carácter de urgencia a pedición de Ankara para tratar el avance del Estado Islámico. El secretario general, Jens Stoltenberg, resalta la unidad de los aliados"
+    val metaDescription = "La Alianza se ha reunido este martes con carácter de urgencia a pedición de Ankara para tratar el avance del Estado Islámico"
     val metaKeywords = "otan, apoyar, cautela, ofensiva, turca, turco, yihadismo, alianza, haber, reunir, martes, urgencia, pedición, ankara, secretario, general, jens stoltenberg, resaltar, unidad, aliado"
 
     check(extract(url), title, metaDescription, metaKeywords, Some("2015-07-29"), content, url)
@@ -95,6 +96,21 @@ class GanderIT extends Specification {
     val metaKeywords = "notícias, notícia, são paulo"
 
     check(extract(url), title, metaDescription, metaKeywords, Some("2012-04-01"), content, url)
+  }
+
+  "opengraph" >> {
+    val url = "http://internacional.elpais.com/internacional/2015/07/28/actualidad/1438076596_960360.html"
+
+    val pageInfo = extract(url)
+    pageInfo.openGraphData must_== OpenGraphData(title = Some("La OTAN apoya con cautela la ofensiva turca contra el yihadismo"),
+                                                 siteName = Some("EL PAÍS"),
+                                                 url = Some(new URL(url)),
+                                                 description = Some("La Alianza se ha reunido este martes con carácter de urgencia a pedición de Ankara para tratar el avance del Estado Islámico"),
+                                                 image = Some(new URL("http://ep00.epimg.net/internacional/imagenes/2015/07/28/actualidad/1438076596_960360_1438078067_noticia_normal.jpg")),
+                                                 `type` = Some("article"),
+                                                 locale = None,
+                                                 publishedTime = Some(new DateTime(2015, 7, 29, 0, 0)))
+
   }
 
 }

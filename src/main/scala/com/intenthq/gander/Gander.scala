@@ -3,9 +3,9 @@ package com.intenthq.gander
 import java.util.Date
 
 import com.gravity.goose.cleaners.DocumentCleaner
-import com.gravity.goose.extractors.{ContentExtractor, OpenGraphDataExtractor}
-import com.gravity.goose.opengraph.OpenGraphData
+import com.gravity.goose.extractors.ContentExtractor
 import com.gravity.goose.outputformatters.StandardOutputFormatter
+import com.intenthq.gander.opengraph.OpenGraphData
 import org.joda.time.DateTime
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
@@ -37,7 +37,7 @@ object Gander {
                           metaKeywords = ContentExtractor.extractMetaKeywords(doc),
                           canonicalLink = canonicalLink,
                           publishDate = publishDate,
-                          openGraphData = OpenGraphDataExtractor.extract(doc)
+                          openGraphData = OpenGraphData(doc)
       )
 
       val cleanedDoc = DocumentCleaner.clean(doc)
