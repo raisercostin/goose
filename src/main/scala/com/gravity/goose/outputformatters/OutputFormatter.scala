@@ -219,11 +219,9 @@ trait OutputFormatter {
 
       for (el <- paragraphs) {
         try {
-//          val stopWords = StopWords.getStopWordCount(el.text, language)
-//        if (el.text.size < 8 && stopWords.getStopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
           val stopWords = StopWords.getStopWordCount(el.text, lang)
-          if (el.text.size < 8 && stopWords.getStopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
-            logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
+          if (el.text.size < 8 && stopWords.stopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
+            logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.stopWordCount, el.text()))
             el.remove()
           }
         }

@@ -31,6 +31,7 @@ import com.chenlb.mmseg4j.{ComplexSeg, Dictionary, MMSeg}
 import com.gravity.goose.Language
 import com.gravity.goose.Language._
 import com.gravity.goose.utils.FileHelper
+import com.intenthq.gander.text.WordStats
 
 import scala.collection.JavaConversions._
 import scala.collection.Set
@@ -40,22 +41,8 @@ object StopWords {
   // the confusing pattern below is basically just match any non-word character excluding white-space.
   private val PUNCTUATION: StringReplacement = StringReplacement.compile("[^\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}\\p{Pc}\\s]", string.empty)
 
-//raisercostin: use the other method of memoising the languages on first access
-  // TODO: there must a better way to do this. See
-  // http://www.uofr.net/~greg/java/get-resource-listing.html?
-//  val LANGUAGES: Set[String] = Set("ar", "da", "de", "en", "es", "fi", "fr",
-//                                   "hu", "id", "it", "ko", "nb", "nl", "no",
-//                                   "pl", "pt", "ru", "sv", "zh")
-//
-//  val stopWordsMap: Map[String, Set[String]] =
-//    (LANGUAGES.view map {lang =>
-//      lang ->
-//      FileHelper.loadResourceFile("stopwords-" + lang + ".txt",
-//        StopWords.getClass).split(sys.props("line.separator")).toSet
-//    }).toMap.withDefaultValue(Set())
-
   //val STOP_WORDS = FileHelper.loadResourceFile("stopwords-en.txt", StopWords.getClass).split(sys.props("line.separator")).toSet
-  private var stopWordsMap: Map[String, Set[String]] = new HashMap[String, Set[String]]()
+  private val stopWordsMap: Map[String, Set[String]] = new HashMap[String, Set[String]]()
 
   def removePunctuation(str: String): String = {
     PUNCTUATION.replaceAll(str)
@@ -74,43 +61,26 @@ object StopWords {
     }
     stopWords    
   }
-  def getCandidateWords(strippedInput: String, language: String): Array[String] = getCandidateWords(strippedInput, 
-      Language(language))
+  def getCandidateWords(strippedInput: String, language: String): Array[String] =
+    getCandidateWords(strippedInput, Language(language))
 
   def getCandidateWords(strippedInput: String, language: Language): Array[String] = {
-	language match {
-	  case English => string.SPACE_SPLITTER.split(strippedInput)
-	  case Chinese => tokenize(strippedInput).toArray
-	  case _ => string.SPACE_SPLITTER.split(strippedInput)
-	}
+    language match {
+      case Chinese => tokenize(strippedInput).toArray
+      case _ => string.SPACE_SPLITTER.split(strippedInput)
+    }
   } 
 
   def getStopWordCount(content: String, lang: String = "en"): WordStats = {
-//  def getStopWordCount(content: String, language: Language): WordStats = {
-
-    if (string.isNullOrEmpty(content)) return WordStats.EMPTY
-    val ws: WordStats = new WordStats
-    val strippedInput: String = removePunctuation(content)
-
-    //val candidateWords = getCandidateWords(strippedInput, language)
-    val candidateWords = getCandidateWords(strippedInput, lang)
-      
-    var overlappingStopWords: List[String] = List[String]()
-
-//    val stopWords = getStopWords(language)
-    val stopWords = getStopWords(lang)
-if (stopWords.size > 0) {
-    //scala-ify? overlappingStopWords = candidateWords.filter(w=>stopWords.contains(w.toLowerCase)).map(w=>w.toLowerCase)
-    candidateWords.foreach(w => {
-       if (stopWords.contains(w.toLowerCase)) {
-         overlappingStopWords = w.toLowerCase :: overlappingStopWords
-       }
-    })
-}
-    ws.setWordCount(candidateWords.length)
-    ws.setStopWordCount(overlappingStopWords.size)
-    ws.setStopWords(overlappingStopWords)
-    ws
+    if (string.isNullOrEmpty(content))
+      WordStats(List.empty, 0)
+    else {
+      val strippedInput = removePunctuation(content)
+      val candidateWords = getCandidateWords(strippedInput, lang)
+      val stopWords = getStopWords(lang)
+      val overlappingStopWords = candidateWords.map(_.toLowerCase).filter(stopWords.contains)
+      WordStats(overlappingStopWords.toList, candidateWords.length)
+    }
   }
   
   def  tokenize(line: String): List[String] = {

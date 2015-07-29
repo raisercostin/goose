@@ -22,6 +22,7 @@ import java.util.{ArrayList, Date}
 import com.gravity.goose.text._
 import com.gravity.goose.utils.Logging
 import com.intenthq.gander.Link
+import com.intenthq.gander.text.WordStats
 import org.jsoup.nodes.{Attributes, Document, Element}
 import org.jsoup.select._
 
@@ -258,7 +259,7 @@ object ContentExtractor extends Logging {
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText, lang)
       val highLinkDensity: Boolean = isHighLinkDensity(node)
       trace("Candidate: " + node.tagName() + " score: " + wordStats + " d:" + highLinkDensity + " text:" + nodeText)
-      if (wordStats.getStopWordCount > 2 && !highLinkDensity) {
+      if (wordStats.stopWordCount > 2 && !highLinkDensity) {
         nodesWithText.add(node)
       }
     }
@@ -291,7 +292,7 @@ object ContentExtractor extends Logging {
 
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText, lang)
-      val upscore: Int = (wordStats.getStopWordCount + boostScore).asInstanceOf[Int]
+      val upscore: Int = (wordStats.stopWordCount + boostScore).asInstanceOf[Int]
       updateScore(node.parent, upscore)
       updateScore(node.parent.parent, upscore / 2)
       updateNodeCount(node.parent, 1)
@@ -365,7 +366,7 @@ object ContentExtractor extends Logging {
           }
           val paraText: String = currentNode.text
           val wordStats: WordStats = StopWords.getStopWordCount(paraText, lang)
-          if (wordStats.getStopWordCount > minimumStopWordCount) {
+          if (wordStats.stopWordCount > minimumStopWordCount) {
             trace(logPrefix + "We're gonna boost this node, seems contenty " + debugNode(node))
             return true
           }
@@ -678,7 +679,7 @@ object ContentExtractor extends Logging {
           if (firstParagraph.text.length() > 0)
 //          wordStats: WordStats = StopWords.getStopWordCount(firstParagraph.text, language)
           wordStats: WordStats = StopWords.getStopWordCount(firstParagraph.text, lang)
-          paragraphScore: Int = wordStats.getStopWordCount
+          paragraphScore: Int = wordStats.stopWordCount
           siblingBaseLineScore: Double = .30
           if ((baselineScoreForSiblingParagraphs * siblingBaseLineScore).toDouble < paragraphScore)
         } yield {
@@ -742,9 +743,9 @@ object ContentExtractor extends Logging {
 //      val wordStats: WordStats = StopWords.getStopWordCount(nodeText, language)
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText, lang)
       val highLinkDensity: Boolean = isHighLinkDensity(node)
-      if (wordStats.getStopWordCount > 2 && !highLinkDensity) {
+      if (wordStats.stopWordCount > 2 && !highLinkDensity) {
         numberOfParagraphs += 1;
-        scoreOfParagraphs += wordStats.getStopWordCount
+        scoreOfParagraphs += wordStats.stopWordCount
       }
     }
     if (numberOfParagraphs > 0) {
