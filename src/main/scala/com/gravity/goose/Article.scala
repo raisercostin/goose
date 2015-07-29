@@ -152,30 +152,4 @@ class Article {
    */
   var openGraphData: OpenGraphData = null
 
-  override def toString =
-    fields.filterNot(_._1=="rawHtml").filterNot(_._1=="doc").filterNot(_._1=="rawDoc").mkString("\n")
-//    s"""Article{
-//  title=$title,
-//  finalUrl=$finalUrl,
-//  cleanedArticleText=$cleanedArticleText,
-//  topImage=$topImage,
-//  tags=$tags,
-//  openGraphData=${openGraphData.values.mkString("\n    ")},
-//  metaDescription=$metaDescription,
-//  metaKeywords=[$metaKeywords],
-//  canonicalLink=$canonicalLink,
-//  allImages=$allImages,
-//  additionalData=$additionalData
-//}"""
-  def fields = {
-    import reflect.runtime.currentMirror
-    import reflect.runtime.universe._
-
-    val r = currentMirror.reflect(this)
-    r.symbol.typeSignature.members.toStream
-      .collect { case s: TermSymbol if !s.isMethod => r.reflectField(s) }
-      .map{r =>
-        r.symbol.name.toString.trim -> (if(r.get==null) "" else r.get.toString)
-      }.toMap
-  }
 }

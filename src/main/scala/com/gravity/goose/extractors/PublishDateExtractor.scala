@@ -19,8 +19,8 @@ package com.gravity.goose.extractors
 
 import org.joda.time.DateTime
 import org.jsoup.nodes.Element
+
 import scala.collection.JavaConverters._
-import com.github.nscala_time.time.Imports._
 
 /**
 * Implement this class to extract the {@link DateTime} of when this article was published.

@@ -18,8 +18,10 @@
 
 package com.gravity.goose.utils
 
-import org.apache.commons.io.IOUtils
-import java.io.{IOException, InputStream}
+import com.google.common.base.Charsets
+import com.google.common.io.Resources
+
+import scala.util.{Failure, Success, Try}
 
 
 /**
@@ -31,15 +33,10 @@ import java.io.{IOException, InputStream}
 object FileHelper extends Logging {
 
   def loadResourceFile[A](filename: String, cls: Class[A]): String = {
-    var filedata: String = ""
-    val is: InputStream = cls.getResourceAsStream(filename)
-    try {
-      filedata = IOUtils.toString(is, "UTF-8")
+    val url = cls.getResource(filename)
+    Try(Resources.toString(url, Charsets.UTF_8)) match {
+      case Success(v) => v
+      case Failure(tr) => warn(s"Error while reading $filename: $tr", tr.toString); ""
     }
-    catch {
-      case e: IOException => warn(s"Error while reading $filename: "+e, e.toString)
-      case e: NullPointerException => warn(s"Error while reading $filename: "+e, e.toString)
-    }
-    filedata
   }
 }

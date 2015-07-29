@@ -15,8 +15,9 @@ Copyright [2014] Robby Pond
  */
 package com.gravity.goose.opengraph;
 
+import org.joda.time.DateTime
+
 import scala.collection.mutable.Set
-import com.github.nscala_time.time.Imports._
 
 case class OpenGraphData() {
   var title: String = ""
