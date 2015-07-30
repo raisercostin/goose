@@ -19,7 +19,7 @@ package com.gravity.goose.cleaners
 
 import java.util.regex.{Matcher, Pattern}
 
-import com.gravity.goose.utils.Logging
+import com.intenthq.gander.utils.Logging
 import com.intenthq.gander.text.ReplaceSequence
 import org.jsoup.nodes.{Document, Element, Node, TextNode}
 import org.jsoup.select.{Collector, Elements, TagsEvaluator}

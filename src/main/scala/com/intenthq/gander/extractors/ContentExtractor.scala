@@ -1,7 +1,7 @@
 package com.intenthq.gander.extractors
 
 import java.util.Date
-import com.gravity.goose.utils.Logging
+import com.intenthq.gander.utils.Logging
 import com.intenthq.gander.Link
 import com.intenthq.gander.text.{ReplaceSequence, StopWords, StringReplacement, WordStats}
 import org.jsoup.nodes.{Document, Element}

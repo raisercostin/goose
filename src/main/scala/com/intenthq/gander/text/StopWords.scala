@@ -4,7 +4,7 @@ import java.io.StringReader
 import com.chenlb.mmseg4j.{ComplexSeg, Dictionary, MMSeg}
 import com.gravity.goose.Language
 import com.gravity.goose.Language.Chinese
-import com.gravity.goose.utils.FileHelper
+import com.intenthq.gander.utils.FileHelper
 import scala.collection.mutable
 
 object StopWords {
