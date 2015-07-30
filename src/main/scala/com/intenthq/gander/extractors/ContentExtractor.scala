@@ -3,26 +3,25 @@ package com.intenthq.gander.extractors
 import java.util.Date
 
 import com.intenthq.gander.Link
-import com.intenthq.gander.text.{ReplaceSequence, StopWords, StringReplacement, WordStats}
+import com.intenthq.gander.text.{StopWords, WordStats}
 import com.intenthq.gander.utils.JSoup._
-import com.intenthq.gander.utils.Logging
 import org.joda.time.DateTime
 import org.jsoup.nodes.{Document, Element}
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.convert.Wrappers.JListWrapper
 import scala.collection.mutable
 import scala.math._
 import scala.util.Try
 
-object ContentExtractor extends Logging {
-  val logPrefix = "ContentExtractor: "
+object ContentExtractor {
+
+  val logger: Logger = LoggerFactory.getLogger(getClass)
 
   class StringSplitter(pattern: String) {
     def split(input: String): Array[String] = input.split(pattern)
   }
 
-  private val motleyReplacement = StringReplacement("&#65533;", "")
-  private val titleReplacements = ReplaceSequence("&raquo;").append("»")
   private val pipeSplitter = new StringSplitter("\\|")
   private val dashSplitter = new StringSplitter(" - ")
   private val arrowsSplitter = new StringSplitter("»")
@@ -30,14 +29,14 @@ object ContentExtractor extends Logging {
 
   def extractTitle(doc: Document): String = {
     val titleElem = byTag("title")(doc)
-    val title = titleElem.headOption.map { x =>
+    titleElem.headOption.map { x =>
       val titleText = x.text
       if (titleText.contains("|")) doTitleSplits(titleText, pipeSplitter)
       else if (titleText.contains("-")) doTitleSplits(titleText, dashSplitter)
       else if (titleText.contains("»")) doTitleSplits(titleText, arrowsSplitter)
       else ""
     }.getOrElse("")
-    motleyReplacement.replaceAll(title).trim
+     .replace("&#65533;", "").trim
   }
 
   /**
@@ -46,7 +45,7 @@ object ContentExtractor extends Logging {
   private def doTitleSplits(title: String, splitter: StringSplitter): String = {
     val titlePieces: Array[String] = splitter.split(title)
     if (titlePieces.isEmpty) ""
-    else titleReplacements.replaceAll(titlePieces.maxBy(_.length)).trim
+    else titlePieces.maxBy(_.length).replace("&raquo;", "").replace("»", "").trim
   }
 
   private def getMetaContent(metaName: String)(implicit doc: Document): String =
@@ -118,14 +117,14 @@ object ContentExtractor extends Logging {
       val nodeText = node.text
       val wordStats = StopWords.stopWordCount(nodeText, lang)
       val highLinkDensity = isHighLinkDensity(node)
-      trace("Candidate: " + node.tagName() + " score: " + wordStats + " d:" + highLinkDensity + " text:" + nodeText)
+      logger.trace("Candidate: " + node.tagName() + " score: " + wordStats + " d:" + highLinkDensity + " text:" + nodeText)
       wordStats.stopWordCount > 2 && !highLinkDensity
     }
 
     val numberOfNodes = nodesWithText.size
     val bottomNodesForNegativeScore = numberOfNodes * 0.25
 
-    trace(logPrefix + "About to inspect num of nodes with text: " + numberOfNodes)
+    logger.trace("About to inspect num of nodes with text: " + numberOfNodes)
 
     def boostScoreForNode(node: Element, startingBoost: Double, count: Int): (Double, Double) = {
       var newStartingBoost = startingBoost
@@ -153,7 +152,7 @@ object ContentExtractor extends Logging {
       val (newStartingBoost, boostScore) = boostScoreForNode(node, startingBoost, count)
       startingBoost = newStartingBoost
 
-      trace(logPrefix + "Location Boost Score: " + boostScore + " on interation: " + count + " tag='"+ node.tagName +"' id='" + node.parent.id + "' class='" + node.parent.attr("class"))
+      logger.trace("Location Boost Score: " + boostScore + " on interation: " + count + " tag='"+ node.tagName +"' id='" + node.parent.id + "' class='" + node.parent.attr("class"))
 
       val wordStats: WordStats = StopWords.stopWordCount(node.text, lang)
       val upscore: Int = (wordStats.stopWordCount + boostScore).toInt
@@ -219,7 +218,7 @@ object ContentExtractor extends Logging {
       val numberOfLinks = links.size
       val score = numberOfLinks * numberOfLinkWords / numberOfWords
 
-      trace(logPrefix + "Calculated link density score as: " + score + " for node: " + getShortText(e.text, 50))
+      logger.trace("Calculated link density score as: " + score + " for node: " + getShortText(e.text, 50))
 
       score >= limit
     }

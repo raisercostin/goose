@@ -6,7 +6,7 @@ import com.intenthq.gander.extractors.ContentExtractor
 import com.intenthq.gander.opengraph.OpenGraphData
 import org.joda.time.DateTime
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
+import org.jsoup.nodes.Element
 
 import scala.collection.convert.Wrappers.JListWrapper
 import scala.util.Try
@@ -47,8 +47,6 @@ object Gander {
       }.getOrElse(info)
     }
 
-
-  def parseDoc(url: String, rawlHtml: String): Option[Document] = Try(Jsoup.parse(rawlHtml, url)).toOption
 
   def extractDate(rootElement: Element): Option[DateTime] = {
     // Try to retrieve publish time from open graph data

@@ -3,10 +3,9 @@ package com.intenthq.gander
 import java.util.regex.Pattern
 
 import com.intenthq.gander.utils.JSoup._
-import com.intenthq.gander.utils.Logging
 import org.jsoup.nodes.{Document, TextNode}
 
-object DocumentCleaner extends Logging {
+object DocumentCleaner {
 
   private val captionPattern = Pattern.compile("^caption$")
   private val googlePattern = Pattern.compile("google")
@@ -24,7 +23,6 @@ object DocumentCleaner extends Logging {
   private val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"
 
   def clean(doc: Document): Document = {
-    trace("Starting cleaning phase")
     //TODO right now this solution mutates this document
     // it would be very nice to implement this with an immutable solution
     implicit val docToClean: Document = doc.clone

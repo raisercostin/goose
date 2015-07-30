@@ -9,5 +9,9 @@ class FileHelperTest extends Specification {
       val txt = FileHelper.loadResourceFile("stopwords-en.txt", StopWords.getClass)
       txt must startWith("a's")
     }
+    " should return empty if the file doesn't exist" >> {
+      val txt = FileHelper.loadResourceFile("stopwords-nonexistant.txt", StopWords.getClass)
+      txt must beEmpty
+    }
   }
 }

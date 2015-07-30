@@ -16,16 +16,24 @@ resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 Defaults.itSettings
 
+scalacOptions ++= Seq(
+  "-Xlint",
+  "-Xfatal-warnings",
+  "-unchecked",
+  "-deprecation",
+  "-feature")
+
 testOptions in Test += Tests.Argument("-oF")
 
 libraryDependencies ++= Seq(
-  "org.slf4j"	% "slf4j-api"	% "1.7.12",
   "commons-lang" % "commons-lang" % "2.6",
-  "com.google.guava" % "guava" % "18.0",
-  "org.jsoup" % "jsoup" % "1.8.2",
-  "joda-time" % "joda-time" % "2.8.1",
   "com.chenlb.mmseg4j" % "mmseg4j-core" % "1.10.0",
+  "com.google.guava" % "guava" % "18.0",
+  "joda-time" % "joda-time" % "2.8.1",
   "junit" % "junit" % "4.12" % Test,
+  "org.joda" % "joda-convert" % "1.7",
+  "org.jsoup" % "jsoup" % "1.8.2",
+  "org.slf4j"	% "slf4j-api"	% "1.7.12",
   "org.specs2" %% "specs2-core" % "3.6.3" % "it,test"
 )
 
