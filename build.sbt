@@ -4,7 +4,7 @@ organization := "com.intenthq"
 
 name := "gander"
 
-version := "0.1-SNAPSHOT"
+version := "0.2-SNAPSHOT"
 
 description := "Extracts text, metadata from web pages."
 

@@ -1,6 +1,7 @@
 package com.intenthq.gander.extractors
 
 import java.util.Date
+import java.util.regex.Pattern
 
 import com.intenthq.gander.Link
 import com.intenthq.gander.text.{StopWords, WordStats}
@@ -18,34 +19,15 @@ object ContentExtractor {
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  class StringSplitter(pattern: String) {
-    def split(input: String): Array[String] = input.split(pattern)
-  }
-
-  private val pipeSplitter = new StringSplitter("\\|")
-  private val dashSplitter = new StringSplitter(" - ")
-  private val arrowsSplitter = new StringSplitter("»")
-  private val spaceSplitter = new StringSplitter(" ")
-
   def extractTitle(doc: Document): String = {
     val titleElem = byTag("title")(doc)
     titleElem.headOption.map { x =>
       val titleText = x.text
-      if (titleText.contains("|")) doTitleSplits(titleText, pipeSplitter)
-      else if (titleText.contains("-")) doTitleSplits(titleText, dashSplitter)
-      else if (titleText.contains("»")) doTitleSplits(titleText, arrowsSplitter)
-      else ""
+      List(" | ", " - ", " » ", " · ").collectFirst {
+        case separator if titleText.contains(separator) => titleText.split(Pattern.quote(separator)).head
+      }.getOrElse(titleText)
     }.getOrElse("")
      .replace("&#65533;", "").trim
-  }
-
-  /**
-  * based on a delimeter in the title take the longest piece or do some custom logic based on the site
-  */
-  private def doTitleSplits(title: String, splitter: StringSplitter): String = {
-    val titlePieces: Array[String] = splitter.split(title)
-    if (titlePieces.isEmpty) ""
-    else titlePieces.maxBy(_.length).replace("&raquo;", "").replace("»", "").trim
   }
 
   private def getMetaContent(metaName: String)(implicit doc: Document): String =
@@ -203,22 +185,20 @@ object ContentExtractor {
    * we're not interested
    */
   private def isHighLinkDensity(implicit e: Element): Boolean = {
-    val limit: Double = 1.0
+    val limit = 1.0
     val links = byTag("a") ++ byAttr("onclick")
 
     if (links.isEmpty)
       false
     else {
-      val text = e.text.trim
-      val words = spaceSplitter.split(text)
-      val numberOfWords = words.length.toDouble
-      val linkText: String = links.mkString(" ").toString
-      val linkWords: Array[String] = spaceSplitter.split(linkText)
-      val numberOfLinkWords = linkWords.length.toDouble
+      val words = e.text.trim.split("\\s+")
+      val linkWords = links.mkString(" ").split("\\s+")
       val numberOfLinks = links.size
+      val numberOfWords = words.length.toDouble
+      val numberOfLinkWords = linkWords.length.toDouble
       val score = numberOfLinks * numberOfLinkWords / numberOfWords
 
-      logger.trace("Calculated link density score as: " + score + " for node: " + getShortText(e.text, 50))
+      logger.trace("Calculated link density score as: {} for node: {}", score, getShortText(e.text, 50))
 
       score >= limit
     }
