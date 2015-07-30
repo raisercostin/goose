@@ -30,23 +30,30 @@ object ContentExtractor {
      .replace("&#65533;", "").trim
   }
 
-  private def getMetaContent(metaName: String)(implicit doc: Document): String =
-    select(metaName).headOption.map(_.attr("content").trim).getOrElse("")
+  def extractLang(doc: Document): Option[String] =
+    byTag("html")(doc).headOption.map(_.attr("lang")).filter(_.nonEmpty).orElse(
+      metaContent("http-equiv=Content-Language")(doc).orElse(
+        metaContent("property=og:locale")(doc)
+      )
+    )
+
+  private def metaContent(metaName: String)(implicit doc: Document): Option[String] =
+    select(s"meta[$metaName]").headOption.map(_.attr("content").trim)
 
   /**
   * if the article has meta description set in the source, use that
   */
   def extractMetaDescription(implicit doc: Document): String =
-    select("meta[name=description]").headOption.map(_.attr("content")).orElse(
-      select("meta[property=og:description]").headOption.map(_.attr("content"))
-    ).orElse(
-      select("meta[name=twitter:description]").headOption.map(_.attr("content"))
+    metaContent("name=description").orElse(
+      metaContent("og:description").orElse(
+        metaContent("name=twitter:description")
+      )
     ).getOrElse("").trim
 
   /**
   * if the article has meta keywords set in the source, use that
   */
-  def extractMetaKeywords(implicit doc: Document): String = getMetaContent("meta[name=keywords]")
+  def extractMetaKeywords(implicit doc: Document): String = metaContent("name=keywords").getOrElse("")
 
   /**
    * if the article has meta canonical link set in the url

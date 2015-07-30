@@ -2,7 +2,7 @@ package com.intenthq.gander
 
 import java.util.Date
 
-import com.intenthq.gander.extractors.ContentExtractor
+import com.intenthq.gander.extractors.ContentExtractor._
 import com.intenthq.gander.opengraph.OpenGraphData
 import org.joda.time.DateTime
 import org.jsoup.Jsoup
@@ -17,6 +17,7 @@ case class Link(text: String, target: String)
 case class PageInfo(title: String,
                     metaDescription: String,
                     metaKeywords: String,
+                    lang: Option[String],
                     canonicalLink: Option[String],
                     openGraphData: OpenGraphData,
                     cleanedText: Option[String] = None,
@@ -27,23 +28,24 @@ object Gander {
 
   def extract(html: String, lang: String = "all"): Option[PageInfo] =
     Try(Jsoup.parse(html)).toOption.map { doc =>
-      val canonicalLink = ContentExtractor.extractCanonicalLink(doc)
-      val publishDate = extractDate(doc).map(_.toDate).orElse(canonicalLink.flatMap(ContentExtractor.extractDateFromURL))
+      val canonicalLink = extractCanonicalLink(doc)
+      val publishDate = extractDate(doc).map(_.toDate).orElse(canonicalLink.flatMap(extractDateFromURL))
 
-      val info = PageInfo(title = ContentExtractor.extractTitle(doc),
-                          metaDescription = ContentExtractor.extractMetaDescription(doc),
-                          metaKeywords = ContentExtractor.extractMetaKeywords(doc),
+      val info = PageInfo(title = extractTitle(doc),
+                          metaDescription = extractMetaDescription(doc),
+                          metaKeywords = extractMetaKeywords(doc),
+                          lang = extractLang(doc),
                           canonicalLink = canonicalLink,
                           publishDate = publishDate,
                           openGraphData = OpenGraphData(doc)
       )
 
       val cleanedDoc = DocumentCleaner.clean(doc)
-      ContentExtractor.calculateBestNodeBasedOnClustering(cleanedDoc, lang).map { node =>
+      calculateBestNodeBasedOnClustering(cleanedDoc, lang).map { node =>
         //some mutability beauty
-        ContentExtractor.postExtractionCleanup(node, lang)
+        postExtractionCleanup(node, lang)
         info.copy(cleanedText = Some(node.text()),
-                  links = ContentExtractor.extractLinks(node))
+                  links = extractLinks(node))
       }.getOrElse(info)
     }
 
