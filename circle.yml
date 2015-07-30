@@ -1,3 +1,6 @@
 test:
   override:
-    - sbt clean coverage test it:test coveralls
+    - sbt clean coverage test it:test
+
+  post:
+    - sbt coveralls
