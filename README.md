@@ -1,4 +1,4 @@
-#Gander [![Circle CI](https://circleci.com/gh/intenthq/gander.svg?style=svg)](https://circleci.com/gh/intenthq/gander)
+#Gander [![Circle CI](https://circleci.com/gh/intenthq/gander.svg?style=svg)](https://circleci.com/gh/intenthq/gander) [![Coverage Status](https://coveralls.io/repos/intenthq/gander/badge.svg?branch=master&service=github)](https://coveralls.io/github/intenthq/gander?branch=master)
 
 Gander is a scala library that extract content from webpages.
  
