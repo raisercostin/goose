@@ -2,7 +2,6 @@ package com.intenthq.gander
 
 import java.util.Date
 
-import com.gravity.goose.cleaners.DocumentCleaner
 import com.intenthq.gander.extractors.ContentExtractor
 import com.intenthq.gander.opengraph.OpenGraphData
 import org.joda.time.DateTime

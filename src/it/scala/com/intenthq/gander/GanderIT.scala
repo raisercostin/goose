@@ -26,11 +26,31 @@ class GanderIT extends Specification {
     pageInfo.canonicalLink.map( _ must_== url).getOrElse(1 must_== 1)
   }
 
+  "intenthq" >> {
+    val url = "http://engineering.intenthq.com/2015/03/what-is-good-code-a-scientific-definition/"
+    val content = "Here at Intent HQ we believe how important it is to write good code. Why? First, because writing good code is much cheaper and more fun than writing bad code. Second, because if you write good code chances are that the product you are building will be much better. Third, and more important, because writing good code is what we are supposed to do: after all, we are getting paid for doing our job well"
+    val title = "What is good code? A scientific definition."
+    val metaDescription = "How would you define good code? This article gives a pseudo-scientific answer to that question after asking a sample of 65 developers that same question."
+    val metaKeywords = ""
+
+    check(extract(url), title, metaDescription, metaKeywords, Some("2015-03-01"), content, url)
+  }
+
   "bbc" >> {
     val url = "http://www.bbc.com/news/business-33697945"
     val content = "Disneyland Paris is facing a pricing probe following accusations that UK and German customers are being frozen out of certain price promotions."
     val title = "Disneyland Paris faces pricing probe"
     val metaDescription = "Disneyland Paris is facing a pricing probe following accusations that UK and German customers are being frozen out of promotions available in other European member states."
+    val metaKeywords = ""
+
+    check(extract(url), title, metaDescription, metaKeywords, None, content, url)
+  }
+
+  "businessinsider" >> {
+    val url = "http://www.businessinsider.com/goldman-on-the-fed-announcement-2011-9"
+    val content = "From Goldman on the FOMC operation twist announcement: ------------- 1. As we had expected, the Federal Open Market Committee decided to \"do the twist\" and increase the duration of its securities holdings by selling shorter-maturity securities ($400bn of Treasuries with maturity of 3 years or less)"
+    val title = "GOLDMAN: 4 Key Points On The FOMC Announcement"
+    val metaDescription = "Here it is."
     val metaKeywords = ""
 
     check(extract(url), title, metaDescription, metaKeywords, None, content, url)
