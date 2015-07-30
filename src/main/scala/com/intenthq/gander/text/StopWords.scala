@@ -1,10 +1,10 @@
 package com.intenthq.gander.text
 
 import java.io.StringReader
+
 import com.chenlb.mmseg4j.{ComplexSeg, Dictionary, MMSeg}
-import com.gravity.goose.Language
-import com.gravity.goose.Language.Chinese
 import com.intenthq.gander.utils.FileHelper
+
 import scala.collection.mutable
 
 object StopWords {
@@ -27,8 +27,8 @@ object StopWords {
     })
 
   def candidateWords(strippedInput: String, language: String): Array[String] =
-    Language(language) match {
-      case Chinese => tokenize(strippedInput).toArray
+    language match {
+      case "zh" => tokenize(strippedInput).toArray
       case _ => strippedInput.split(" ")
     }
 

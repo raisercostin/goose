@@ -6,6 +6,7 @@ import com.intenthq.gander.Link
 import com.intenthq.gander.text.{ReplaceSequence, StopWords, StringReplacement, WordStats}
 import com.intenthq.gander.utils.JSoup._
 import com.intenthq.gander.utils.Logging
+import org.joda.time.DateTime
 import org.jsoup.nodes.{Document, Element}
 
 import scala.collection.convert.Wrappers.JListWrapper
@@ -97,9 +98,9 @@ object ContentExtractor extends Logging {
 
     val (year, month, day) = findYearMonthAndDay(url.split("/"))
     year.map { y =>
-      val m = month.getOrElse(1) - 1
+      val m = month.getOrElse(1)
       val d = day.getOrElse(1)
-      new Date(y - 1900, m, d)
+      new DateTime(y, m, d, 0, 0).toDate
     }
   }
 
