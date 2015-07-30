@@ -3,7 +3,7 @@ package com.intenthq.gander
 import java.util.Date
 
 import com.gravity.goose.cleaners.DocumentCleaner
-import com.gravity.goose.extractors.ContentExtractor
+import com.intenthq.gander.extractors.ContentExtractor
 import com.intenthq.gander.opengraph.OpenGraphData
 import org.joda.time.DateTime
 import org.jsoup.Jsoup
@@ -44,7 +44,7 @@ object Gander {
         //some mutability beauty
         ContentExtractor.postExtractionCleanup(node, lang)
         info.copy(cleanedText = Some(node.text()),
-                  links = ContentExtractor.extractLinks1(node))
+                  links = ContentExtractor.extractLinks(node))
       }.getOrElse(info)
     }
 
