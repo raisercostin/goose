@@ -1,12 +1,14 @@
 package com.intenthq.gander.extractors
 
 import java.util.Date
-import com.intenthq.gander.utils.Logging
+
 import com.intenthq.gander.Link
 import com.intenthq.gander.text.{ReplaceSequence, StopWords, StringReplacement, WordStats}
+import com.intenthq.gander.utils.JSoup._
+import com.intenthq.gander.utils.Logging
 import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.{Collector, Elements, TagsEvaluator}
-import scala.collection.JavaConversions._
+
+import scala.collection.convert.Wrappers.JListWrapper
 import scala.collection.mutable
 import scala.math._
 import scala.util.Try
@@ -24,19 +26,16 @@ object ContentExtractor extends Logging {
   private val dashSplitter = new StringSplitter(" - ")
   private val arrowsSplitter = new StringSplitter("»")
   private val spaceSplitter = new StringSplitter(" ")
-  private val topNodeTags = new TagsEvaluator(Set("p", "td", "pre", "strong", "li", "code"))
 
   def extractTitle(doc: Document): String = {
-    val titleElem = doc.getElementsByTag("title")
-    val title =
-      if (titleElem.isEmpty) ""
-      else {
-        val titleText = titleElem.first.text
-        if (titleText.contains("|")) doTitleSplits(titleText, pipeSplitter)
-        else if (titleText.contains("-")) doTitleSplits(titleText, dashSplitter)
-        else if (titleText.contains("»")) doTitleSplits(titleText, arrowsSplitter)
-        else ""
-      }
+    val titleElem = byTag("title")(doc)
+    val title = titleElem.headOption.map { x =>
+      val titleText = x.text
+      if (titleText.contains("|")) doTitleSplits(titleText, pipeSplitter)
+      else if (titleText.contains("-")) doTitleSplits(titleText, dashSplitter)
+      else if (titleText.contains("»")) doTitleSplits(titleText, arrowsSplitter)
+      else ""
+    }.getOrElse("")
     motleyReplacement.replaceAll(title).trim
   }
 
@@ -49,47 +48,33 @@ object ContentExtractor extends Logging {
     else titleReplacements.replaceAll(titlePieces.maxBy(_.length)).trim
   }
 
-  private def getMetaContent(doc: Document, metaName: String): String = {
-    val meta: Elements = doc.select(metaName)
-    if (meta.isEmpty) ""
-    else meta.first.attr("content").trim
-  }
-
-  private def firstNonEmpty(elements: (() => String)*): String = {
-    if (elements.isEmpty) ""
-    else {
-      val first: String = elements.head()
-      if (first.isEmpty) firstNonEmpty(elements.tail :_ *)
-      else first
-    }
-  }
+  private def getMetaContent(metaName: String)(implicit doc: Document): String =
+    select(metaName).headOption.map(_.attr("content").trim).getOrElse("")
 
   /**
   * if the article has meta description set in the source, use that
   */
-  def extractMetaDescription(doc: Document): String =
-    firstNonEmpty(
-      () => doc.select("meta[name=description]").attr("content"),
-      () => doc.select("meta[property=og:description]").attr("content"),
-      () => doc.select("meta[name=twitter:description]").attr("content")
-    ).trim
+  def extractMetaDescription(implicit doc: Document): String =
+    select("meta[name=description]").headOption.map(_.attr("content")).orElse(
+      select("meta[property=og:description]").headOption.map(_.attr("content"))
+    ).orElse(
+      select("meta[name=twitter:description]").headOption.map(_.attr("content"))
+    ).getOrElse("").trim
 
   /**
   * if the article has meta keywords set in the source, use that
   */
-  def extractMetaKeywords(doc: Document): String = getMetaContent(doc, "meta[name=keywords]")
+  def extractMetaKeywords(implicit doc: Document): String = getMetaContent("meta[name=keywords]")
 
   /**
    * if the article has meta canonical link set in the url
    */
-  def extractCanonicalLink(doc: Document): Option[String] = {
-    val href = firstNonEmpty(
-      () => doc.select("link[rel=canonical]").attr("abs:href"),
-      () => doc.select("meta[property=og:url]").attr("abs:content"),
-      () => doc.select("meta[name=twitter:url]").attr("abs:content")
-    ).trim
-    if (href.nonEmpty) Some(href) else None
-  }
+  def extractCanonicalLink(implicit doc: Document): Option[String] =
+    select("link[rel=canonical]").headOption.map(_.attr("abs:href")).orElse(
+      select("meta[property=og:url]").headOption.map(_.attr("abs:content"))
+    ).orElse(
+      select("meta[name=twitter:url]").headOption.map(_.attr("abs:content"))
+    ).map(_.trim)
 
   def extractDateFromURL(url: String): Option[Date] = {
     def findYearMonthAndDay(segments: Array[String]): (Option[Int], Option[Int], Option[Int]) = {
@@ -124,8 +109,9 @@ object ContentExtractor extends Logging {
   * also store on how high up the paragraphs are, comments are usually at the bottom and should get a lower score
   */
   def calculateBestNodeBasedOnClustering(document: Document, lang:String): Option[Element] = {
-    val doc = document.clone
-    val nodesToCheck = Collector.collect(topNodeTags, doc)
+    implicit val doc = document.clone
+
+    val nodesToCheck = byTag("p") ++ byTag("td") ++ byTag("pre") ++ byTag("strong") ++ byTag("li") ++ byTag("code")
 
     val nodesWithText = nodesToCheck.filter { node =>
       val nodeText = node.text
@@ -216,11 +202,11 @@ object ContentExtractor extends Logging {
    * Checks the density of links within a node. If there's not much text and what's there is mostly links,
    * we're not interested
    */
-  private def isHighLinkDensity(e: Element, limit: Double = 1.0): Boolean = {
-    val links = e.getElementsByTag("a")
-    links.addAll(e.getElementsByAttribute("onclick"))
+  private def isHighLinkDensity(implicit e: Element): Boolean = {
+    val limit: Double = 1.0
+    val links = byTag("a") ++ byAttr("onclick")
 
-    if (links.size == 0)
+    if (links.isEmpty)
       false
     else {
       val text = e.text.trim
@@ -266,23 +252,18 @@ object ContentExtractor extends Logging {
   /**
    * pulls out links we like
    */
-  def extractLinks(node: Element): Seq[Link] =
-    node.parent.select("a[href]")
+  def extractLinks(implicit node: Element): Seq[Link] =
+    select("a[href]")
       .filter(el => el.attr("href") != "#" && !el.attr("abs:href").trim.isEmpty)
       .map(el => Link(el.text, el.attr("abs:href")))
 
-  private def isTableTagAndNoParagraphsExist(e: Element): Boolean = {
-    val subParagraphs: Elements = getChildParagraphs(e)
-    for (p <- subParagraphs) {
-      if (p.text.length < 25) {
-        p.remove()
-      }
-    }
+  private def isTableTagAndNoParagraphsExist(implicit e: Element): Boolean = {
+    getChildParagraphs(e).filter(_.text.length < 25).foreach(remove)
 
-    val subParagraphs2: Elements = e.getElementsByTag("p")
-    if (subParagraphs2.size == 0 && e.tagName != "td") {
+    val subParagraphs2 = byTag("p")
+    if (subParagraphs2.isEmpty && e.tagName != "td") {
       if (e.tagName == "ul" || e.tagName == "ol") {
-        val linkTextLength = e.getElementsByTag("a").map(_.text.length).sum
+        val linkTextLength = byTag("a").map(_.text.length).sum
         val elementTextLength = e.text.length
         elementTextLength <= 2 * linkTextLength
       }
@@ -295,10 +276,10 @@ object ContentExtractor extends Logging {
   */
   def postExtractionCleanup(targetNode: Element, lang: String): Element = {
     val node = addSiblings(targetNode, lang)
-    node.children
+    JListWrapper(node.children)
       .filter(e => e.tagName != "p" || isHighLinkDensity(e))
       .filter(e => isHighLinkDensity(e) || isTableTagAndNoParagraphsExist(e) || !isNodeScoreThresholdMet(node, e))
-      .foreach(e => Try(e.remove()))
+      .foreach(remove)
     node
   }
   
@@ -309,11 +290,7 @@ object ContentExtractor extends Logging {
     !(currentNodeScore < thresholdScore && e.tagName != "td")
   }
 
-  private def getChildParagraphs(e: Element): Elements = {
-    val potentialParagraphs = e.getElementsByTag("p")
-    potentialParagraphs.addAll(e.getElementsByTag("strong"))
-    potentialParagraphs
-  }
+  private def getChildParagraphs(implicit e: Element): Seq[Element] = byTag("p") ++ byTag("strong")
 
   /**
   * adds any siblings that may have a decent score to this node

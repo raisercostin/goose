@@ -2,10 +2,9 @@ package com.intenthq.gander
 
 import java.util.regex.Pattern
 
+import com.intenthq.gander.utils.JSoup._
 import com.intenthq.gander.utils.Logging
-import org.jsoup.nodes.{Document, Element, TextNode}
-
-import scala.collection.convert.Wrappers.JListWrapper
+import org.jsoup.nodes.{Document, TextNode}
 
 object DocumentCleaner extends Logging {
 
@@ -61,7 +60,7 @@ object DocumentCleaner extends Logging {
    * removes nodes that may have a certain pattern that matches against a class or id tag
    */
   private def removeNodesViaRegEx(pattern: Pattern)(implicit doc: Document): Unit =
-    (byAttr("id", pattern) ++ byAttr("class", pattern)).foreach(remove)
+    (byAttrRe("id", pattern) ++ byAttrRe("class", pattern)).foreach(remove)
 
   /**
   * takes care of the situation where you have a span tag nested in a paragraph tag
@@ -72,14 +71,5 @@ object DocumentCleaner extends Logging {
       val tn = new TextNode(node.text, doc.baseUri)
       node.replaceWith(tn)
     }
-
-  private def byTag(tag: String)(implicit doc: Document): Seq[Element] = JListWrapper(doc.getElementsByTag(tag))
-
-  private def byAttr(attr: String, pattern: Pattern)(implicit doc: Document): Seq[Element] =
-    JListWrapper(doc.getElementsByAttributeValueMatching(attr, pattern))
-
-  private def select(query: String)(implicit doc: Document): Seq[Element] = JListWrapper(doc.select(query))
-
-  private def remove(elem: Element) = Option(elem.parent()).foreach(_ => elem.remove())
 
 }
