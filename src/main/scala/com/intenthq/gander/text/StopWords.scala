@@ -1,11 +1,7 @@
 package com.intenthq.gander.text
 
-import java.io.StringReader
 import java.util.regex.Pattern
-
-import com.chenlb.mmseg4j.{ComplexSeg, Dictionary, MMSeg}
 import com.intenthq.gander.utils.FileHelper
-
 import scala.collection.mutable
 
 object StopWords {
@@ -27,11 +23,7 @@ object StopWords {
       stopWords
     })
 
-  def candidateWords(strippedInput: String, language: String): Array[String] =
-    language match {
-      case "zh" => tokenize(strippedInput).toArray
-      case _ => strippedInput.split(" ")
-    }
+  def candidateWords(strippedInput: String, language: String): Array[String] = strippedInput.split(" ")
 
   def stopWordCount(content: String, lang: String = "en"): WordStats = {
     val strippedInput = removePunctuation(content)
@@ -39,17 +31,5 @@ object StopWords {
     val stop = stopWords(lang)
     val overlappingStopWords = candidates.map(_.toLowerCase).filter(stop.contains)
     WordStats(overlappingStopWords.toList, candidates.length)
-  }
-
-  def tokenize(line: String): List[String] = {
-    val seg = new ComplexSeg(Dictionary.getInstance())
-    val mmSeg = new MMSeg(new StringReader(line), seg)
-    var tokens = List.empty[String]
-    var word = mmSeg.next()
-    while (word != null) {
-      tokens = word.getString :: tokens
-      word = mmSeg.next()
-    }
-    tokens
   }
 }

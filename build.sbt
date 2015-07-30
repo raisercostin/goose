@@ -27,7 +27,6 @@ testOptions in Test += Tests.Argument("-oF")
 
 libraryDependencies ++= Seq(
   "commons-lang" % "commons-lang" % "2.6",
-  "com.chenlb.mmseg4j" % "mmseg4j-core" % "1.10.0",
   "com.google.guava" % "guava" % "18.0",
   "joda-time" % "joda-time" % "2.8.1",
   "junit" % "junit" % "4.12" % Test,
