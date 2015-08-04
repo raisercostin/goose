@@ -23,6 +23,8 @@ scalacOptions ++= Seq(
 
 testOptions in Test += Tests.Argument("-oF")
 
+credentials += Credentials(Path.userHome / ".ivy2" / ".maven-credentials")
+
 libraryDependencies ++= Seq(
   "commons-lang" % "commons-lang" % "2.6",
   "com.google.guava" % "guava" % "18.0",
