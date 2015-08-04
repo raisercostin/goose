@@ -27,12 +27,12 @@ the following line (remember to replace 1.0 with the latest version):
 ### In your code
 
 Gander provides a single object and a single method to access its functionality
-and it's pretty straight forward and intuitive to use.
+and it's pretty straightforward and intuitive to use.
 
-This three lines of code, for example, would download the url specified (using
+This three lines of code, for example, will download the specified url (using
 Guava) and extract the page information from the raw html:
 ```scala
-val url = "http://engineering.intenthq.com/2015/03/what-is-good-code-a-scientific-definition/"
+val url = "http://engineering.intenthq.com"
 val rawHTML = Resources.toString(new URL(url), charset)
 println(Gander.extract(rawHTML))
 
@@ -40,10 +40,16 @@ println(Gander.extract(rawHTML))
 
 You can find more examples in our tests.
 
-## Collaborate & Philosophy
-Keep it simple and make 1 thing
-Remove the code that was doing other stuff (downloading)
-Removed images for simplicity, we may want to add it in the future.
-The interface is so simple that can be easily used from Java as well.
+## Philosophy
 
-Please, feel free to fork the repo and raise a PR.
+The idea behind Gander is to do one thing and do it well. That's why we've
+removed some of the features that were not related to its core functionality.
+
+This project will always try to be better at extracting data and information
+from webpages. But it won't deal with other (probably related but not core)
+functionalities (like downloading html from urls).
+
+## Collaborate
+
+Please, feel free to raise an issue, fork the repo, send pull requests...
+Any idea or improvement will be welcome.

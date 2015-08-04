@@ -25,7 +25,7 @@ class GanderIT extends Specification {
     pageInfo.publishDate must_== date.map(DateTime.parse(_).toDate)
     pageInfo.cleanedText.get must startWith(content)
     pageInfo.canonicalLink.map( _ must_== url).getOrElse(1 must_== 1)
-    pageInfo.links must containAllOf(links)
+    pageInfo.links must_== links
   }
 
   "intenthq" >> {
