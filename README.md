@@ -1,4 +1,4 @@
-#Gander [![Circle CI](https://circleci.com/gh/intenthq/gander.svg?style=svg)](https://circleci.com/gh/intenthq/gander) [![Coverage Status](https://coveralls.io/repos/intenthq/gander/badge.svg?branch=master&service=github)](https://coveralls.io/github/intenthq/gander?branch=master) [![Join the chat at https://gitter.im/intenthq/gander](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/intenthq/gander?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+#Gander [![Circle CI](https://img.shields.io/circleci/project/intenthq/gander.svg)](https://circleci.com/gh/intenthq/gander) [![Coverage Status] (https://img.shields.io/coveralls/intenthq/gander.svg)](https://coveralls.io/github/intenthq/gander?branch=master) [![Maven Central](https://img.shields.io/maven-central/v/com.intenthq/gander_2.11.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.intenthq%22%20AND%20a%3A%22gander_2.11%22) [![Join the chat at https://gitter.im/intenthq/gander](https://img.shields.io/badge/gitter-join%20chat-green.svg)](https://gitter.im/intenthq/gander)
 
 **Gander is a scala library that extracts metadata and content from web pages.**
  
