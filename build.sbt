@@ -4,8 +4,6 @@ organization := "com.intenthq"
 
 name := "gander"
 
-version := "0.2-SNAPSHOT"
-
 description := "Extracts text, metadata from web pages."
 
 licenses += "Apache2" -> url("http://www.apache.org/licenses/")
@@ -37,5 +35,7 @@ libraryDependencies ++= Seq(
 )
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
+
+publishTo := Some("Sonatype Snapshots Nexus" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 
 lazy val root = project.in(file(".")).configs(IntegrationTest)
