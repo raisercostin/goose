@@ -17,7 +17,7 @@ class GanderIT extends Specification {
   }
 
   def check(pageInfo: PageInfo, title: String, metaDescription: String, metaKeywords: String,
-            lang: Option[String], date: Option[String], content: String, url: String) = {
+            lang: Option[String], date: Option[String], content: String, url: String, links: Seq[Link]) = {
     pageInfo.title must_== title
     pageInfo.metaDescription must_== metaDescription
     pageInfo.metaKeywords must_== metaKeywords
@@ -25,6 +25,7 @@ class GanderIT extends Specification {
     pageInfo.publishDate must_== date.map(DateTime.parse(_).toDate)
     pageInfo.cleanedText.get must startWith(content)
     pageInfo.canonicalLink.map( _ must_== url).getOrElse(1 must_== 1)
+    pageInfo.links must_== links
   }
 
   "intenthq" >> {
@@ -36,7 +37,9 @@ class GanderIT extends Specification {
       metaDescription = "How would you define good code? This article gives a pseudo-scientific answer to that question after asking a sample of 65 developers that same question.",
       metaKeywords = "",
       lang = Some("en-GB"),
-      date = Some("2015-03-01"))
+      date = Some("2015-03-01"),
+      links = List(Link("Uncle Bob", "http://en.wikipedia.org/wiki/Robert_Cecil_Martin"),
+                   Link("DRY", "http://en.wikipedia.org/wiki/Don%27t_repeat_yourself")))
   }
 
   "bbc" >> {
@@ -48,7 +51,10 @@ class GanderIT extends Specification {
       metaDescription = "Disneyland Paris is facing a pricing probe following accusations that UK and German customers are being frozen out of promotions available in other European member states.",
       metaKeywords = "",
       lang = Some("en"),
-      date = None)
+      date = None,
+      links = List(Link("Financial Times said", "http://www.ft.com/cms/s/0/27e42c8e-351d-11e5-b05b-b01debd57852.html#axzz3hDFfsPCX"),
+                   Link("said in a report", "http://www.ft.com/cms/s/0/27e42c8e-351d-11e5-b05b-b01debd57852.html#axzz3hDFfsPCX")))
+
   }
 
   "businessinsider" >> {
@@ -60,7 +66,8 @@ class GanderIT extends Specification {
       metaDescription = "Here it is.",
       metaKeywords = "",
       lang = Some("en"),
-      date = None)
+      date = None,
+      links = List(Link("announcement", "http://www.businessinsider.com/federal-reserve-announcement-fomc-operation-twist-2011-9")))
   }
 
   "elpais" >> {
@@ -72,7 +79,13 @@ class GanderIT extends Specification {
       metaDescription = "La Alianza se ha reunido este martes con carácter de urgencia a pedición de Ankara para tratar el avance del Estado Islámico",
       metaKeywords = "otan, apoyar, cautela, ofensiva, turca, turco, yihadismo, alianza, haber, reunir, martes, urgencia, pedición, ankara, secretario, general, jens stoltenberg, resaltar, unidad, aliado",
       lang = Some("es"),
-      date = Some("2015-07-29"))
+      date = Some("2015-07-29"),
+      links = List(Link("en su ofensiva contra el Estado Islámico", "http://internacional.elpais.com/internacional/2015/07/24/actualidad/1437717227_199769.html"),
+                   Link("Jens Stoltenberg.", "http://elpais.com/tag/jens_stoltenberg/a/"),
+                   Link("que este martes hizo estallar un tramo de un gasoducto procedente de Irán", "http://internacional.elpais.com/internacional/2015/07/28/actualidad/1438079899_805996.html"),
+                   Link("onflicto entre Ankara y los simpatizantes del PKK", "http://internacional.elpais.com/internacional/2015/07/27/actualidad/1437986632_361510.html"),
+                   Link("crear una zona libre de combatientes del EI", "http://internacional.elpais.com/internacional/2015/07/27/actualidad/1438026945_461718.html"),
+                   Link("Ahmet Davutoglu", "http://elpais.com/tag/ahmet_davutoglu/a/")))
   }
 
   "corriere" >> {
@@ -84,7 +97,9 @@ class GanderIT extends Specification {
       metaDescription = "Non si propone lo scioglimento ma si lascia aperta la possibilità di una «diversa valutazione»",
       metaKeywords = "Ignazio Marino, Angelino Alfano",
       lang = Some("it"),
-      date = None)
+      date = None,
+      links = List(Link("giunta guidata da Ignazio Marino", "http://roma.corriere.it/notizie/politica/15_luglio_28/giunta-marino-senatore-no-tav-esposito-assessore-trasporti-d0e76efa-34fe-11e5-984f-1e10ffe171ae.shtml")))
+
   }
 
   "lemonde" >> {
@@ -100,18 +115,6 @@ class GanderIT extends Specification {
     pending
   }
 
-  "folha" >> {
-    val url = "http://www1.folha.uol.com.br/esporte/2012/04/1070420-leao-critica-regulamento-do-paulista-e-poe-culpa-na-tv.shtml"
-    check(extract(url, Charsets.ISO_8859_1),
-      url = "http://www1.folha.uol.com.br/esporte/1070420-leao-critica-regulamento-do-paulista-e-poe-culpa-na-tv.shtml",
-      content = "Após retomar a liderança do Campeonato Paulista, com a vitória do São Paulo de virada por 4 a 2 sobre o Ituano",
-      title = "Leão critica regulamento do Paulista e põe culpa na TV",
-      metaDescription = "Após retomar a liderança do Campeonato Paulista, com a vitória do São Paulo de virada por 4 a 2 sobre o Ituano, o técnico Emerson Leão voltou a criticar a fórmula de disputa da competição e a FPF (Federação Paulista de Futebol), apontado a culpa para a emissora de televisão dona dos direitos de transmissão.",
-      metaKeywords = "São Paulo, Emerson Leão, Campeonato Paulista, FPF,, jornalismo, informação, economia, política, fotografia, imagem, noticiário, cultura, tecnologia, esporte, Brasil, internacional, geral, polícia, manchetes, loteria, loterias, resultados, opinião, análise, cobertura",
-      lang = None,
-      date = None)
-  }
-
   "lancenet" >> {
     val url = "http://www.lancenet.com.br/sao-paulo/Leao-Arena-Barueri-casa-Tricolor_0_675532605.html"
     check(extract(url),
@@ -121,7 +124,8 @@ class GanderIT extends Specification {
       metaDescription = "No próximo sábado, o São Paulo jogará, como mandante, na Arena Barueri diante do Mogi Mirim. Isso porque no estádio do Morumbi haverá, nesta ...",
       metaKeywords = "Leao,Arena,Barueri,casa,Tricolor",
       lang = Some("pt"),
-      date = Some("2012-04-03T18:30:00Z"))
+      date = Some("2012-04-03T18:30:00Z"),
+      links = List())
   }
 
   "globoesporte" >> {
@@ -133,7 +137,8 @@ class GanderIT extends Specification {
       metaDescription = "Emerson Le&atilde;o cobra lideran&ccedil;a ao S&atilde;o Paulo (Foto: M&aacute;rio &Acirc;ngelo / Ag. Estado) Emerson Le&atilde;o n&atilde;o foi ao campo na manh&atilde; desta ter&ccedil;a-feira no centro de treinamento do S&atilde;o Paulo. Bem humorado e com roupa casual, preferiu acompanhar de longe ...",
       metaKeywords = "notícias, notícia, são paulo",
       lang = None,
-      date = Some("2012-04-01"))
+      date = Some("2012-04-01"),
+      links = List())
   }
 
   "opengraph" >> {
