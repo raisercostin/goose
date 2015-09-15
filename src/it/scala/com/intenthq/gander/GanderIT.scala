@@ -42,7 +42,7 @@ class GanderIT extends Specification {
                    Link("DRY", "http://en.wikipedia.org/wiki/Don%27t_repeat_yourself")))
   }
 
-  "bbc" >> {
+  "bbc.com" >> {
     val url = "http://www.bbc.com/news/business-33697945"
     check(extract(url),
       url = url,
@@ -55,6 +55,20 @@ class GanderIT extends Specification {
       links = List(Link("Financial Times said", "http://www.ft.com/cms/s/0/27e42c8e-351d-11e5-b05b-b01debd57852.html#axzz3hDFfsPCX"),
                    Link("said in a report", "http://www.ft.com/cms/s/0/27e42c8e-351d-11e5-b05b-b01debd57852.html#axzz3hDFfsPCX")))
 
+  }
+
+  "bbc.co.uk" >> {
+    val url = "http://www.bbc.co.uk/sport/0/football/34203622"
+    check(extract(url),
+      url = url,
+      content = "Manchester City striker Sergio Aguero will miss Tuesday's Champions League opener against Juventus at Etihad Stadium because of a knee injury",
+      title = "BBC Sport",
+      metaDescription = "Manchester City striker Sergio Aguero will miss Tuesday's Champions League opener against Juventus with a knee injury.",
+      metaKeywords = "BBC, Sport, BBC Sport, bbc.co.uk, world, uk, international, foreign, british, online, service",
+      lang = Some("en-GB"),
+      date = None,
+      links = List(Link("City's 1-0 win at Crystal Palace", "http://m.bbc.co.uk/sport/football/34160754"),
+                   Link("losing 3-1 on aggregate", "http://www.bbc.co.uk/sport/0/football/31922160")))
   }
 
   "businessinsider" >> {

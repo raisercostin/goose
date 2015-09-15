@@ -15,7 +15,7 @@ object DocumentCleaner {
    * this regex is used to remove undesirable nodes from our doc
    * indicate that something maybe isn't content but more of a comment, footer or some other undesirable node
    */
-  private val regExRemoveNodes = "^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment(?!ed)|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|scroll(?!able)|shoutbox|sponsor" +
+  private val regExRemoveNodes = "^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment(?!ed)|PopularQuestions|contact|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|scroll(?!able)|shoutbox|sponsor" +
     "|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip" +
     "|communitypromo|promo_holder|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text"
   private val queryNaughtyIDs = "[id~=(" + regExRemoveNodes + ")]"
@@ -49,7 +49,7 @@ object DocumentCleaner {
     }
 
   private def removeScriptsAndStyles(implicit doc: Document): Unit =
-    (byTag("script") ++ byTag("style")).foreach(remove)
+    (byTag("script") ++ byTag("style") ++ byTag("noscript")).foreach(remove)
 
   private def cleanBadTags(implicit doc: Document): Unit =
     (select(queryNaughtyIDs) ++ select(queryNaughtyClasses) ++ select(queryNaughtyNames)).foreach(remove)
