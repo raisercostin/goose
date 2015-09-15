@@ -1,131 +1,55 @@
-#Goose - Article Extractor
+#Gander [![Build Status](https://img.shields.io/travis/intenthq/gander.svg)](https://travis-ci.org/intenthq/gander) [![Coverage Status] (https://img.shields.io/coveralls/intenthq/gander.svg)](https://coveralls.io/github/intenthq/gander?branch=master) [![Maven Central](https://img.shields.io/maven-central/v/com.intenthq/gander_2.11.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.intenthq%22%20AND%20a%3A%22gander_2.11%22) [![Join the chat at https://gitter.im/intenthq/gander](https://img.shields.io/badge/gitter-join%20chat-green.svg)](https://gitter.im/intenthq/gander)
 
-[Goose](https://github.com/GravityLabs/goose) fork published on Maven Central.
+**Gander is a scala library that extracts metadata and content from web pages.**
 
-## This is a fork
+It is based on [Goose](https://github.com/GravityLabs/goose) with the idea to:
+- Simplify its codebase by removing some of its functionality (like crawling, there are plenty of project that do it well)
+- Keep it alive (goose has been inactive for several years now)
+- Make its codebase more functional and take advantage of some of newer scala features
 
-If you haven't guessed already, this is a fork of the wonderful [Goose library](http://github.com/GravityLabs/goose) by Gravity Labs. The original repo hasn't been updated for 2 years now, and there have been quite [a few nice pull requests](https://github.com/GravityLabs/goose/pulls) that are lying dormant.
+## What data does it extract?
 
-The project now uses sbt, and is hosted on Sonatype. Add the following to to your `build.sbt` to pull it in:
+Gander will try to extract three different kinds of data from a web page:
+- Metadata: (title, meta description, meta keywords, language, canonical link, open graph data,
+publish date)
+- Main text for the page
+- Links present in the main text of the page
+
+## Using Gander
+
+### Adding the dependency
+
+The artefact is published in maven central. If you are using sbt you just need to add
+the following line (remember to replace 1.0 with the latest version):
+```
+"com.intenthq" % "gander" % "1.0"
+```
+### In your code
+
+Gander provides a single object and a single method to access its functionality
+and it's pretty straightforward and intuitive to use.
+
+This three lines of code, for example, will download the specified url (using
+Guava) and extract the page information from the raw html:
+```scala
+val url = "http://engineering.intenthq.com"
+val rawHTML = Resources.toString(new URL(url), charset)
+println(Gander.extract(rawHTML))
 
 ```
-libraryDependencies ++= Seq("com.gravity" %% "goose" % "2.1.25-SNAPSHOT")
 
-resolvers += Resolver.sonatypeRepo("public")
-```
+You can find more examples in our tests.
 
-##Intro
+## Philosophy
 
-Goose was originally an article extractor written in Java that has most recently (aug2011) converted to a Scala project. It's mission is to take any news article or article type web page and not only extract what is the main body of the article but also all meta data and most probable image candidate.
+The idea behind Gander is to do one thing and do it well. That's why we've
+removed some of the features that were not related to its core functionality.
 
-The extraction goal is to try and get the purest extraction from the beginning of the article for servicing flipboard/pulse type applications that need to show the first snippet of a web article along with an image.
+This project will always try to be better at extracting data and information
+from webpages. But it won't deal with other (probably related but not core)
+functionalities (like downloading html from urls).
 
-Goose will try to extract the following information:
+## Collaborate
 
- - Main text of an article
- - Main image of article
- - Any Youtube/Vimeo movies embedded in article
- - Meta Description
- - Meta tags
- - Publish Date
-
-
-The wiki has the full details on how to use Goose [https://github.com/jiminoc/goose/wiki](https://github.com/jiminoc/goose/wiki)
-
-Goose was open sourced by Gravity.com in 2011
-
-Lead Programmer: Jim Plush (Gravity.com)
-
-Contributers: Robbie Coleman (Gravity.com)
-
-
-Try it out online!
-http://jimplush.com/blog/goose
-
-
-##Licensing
-If you find Goose useful or have issues please drop me a line, I'd love to hear how you're using it or what features should be improved
-
-Goose is licensed by Gravity.com under the Apache 2.0 license, see the LICENSE file for more details
-
-##Environment Prerequisites
-
-The default behaviour is by using java image processing capabilities.
-
-### ImageMagick
-
-You will need to have ImageMagick installed for Goose to work correctly.
-
-On osx, you can install with brew:
-        $ brew install imagemagick
-
-Update Configuration.scala with the location of identify and convert (eg /usr/local/bin)
-
-##Take it for a spin
-
-### SBT
-To use goose from the command line:
-
-    cd into the goose directory
-    sbt "run-main com.gravity.goose.TalkToMeGoose http://techcrunch.com/2011/05/13/native-apps-or-web-apps-particle-code-wants-you-to-do-both/"
-
-### MVN
-    cd into the goose directory
-    mvn compile
-    MAVEN_OPTS="-Xms256m -Xmx2000m"; mvn exec:java -Dexec.mainClass=com.gravity.goose.TalkToMeGoose -Dexec.args="http://techcrunch.com/2011/05/13/native-apps-or-web-apps-particle-code-wants-you-to-do-both/" -e -q > ~/Desktop/gooseresult.txt
-
-
-##Testing
-To run the junit tests, kick off the sbt test target:
-
-    sbt test
-
-Note that there are currently problems in the tests. (8 failures in 41 tests on 2014-07-10 - raisercostin)
-
-##Usage as a maven dependency
-
-Last version (goose_2.10-2.2.0.jar) is hosted at http://raisercostin.googlecode.com/svn/maven2/com/gravity/goose/
-Goose is hosted on Sonatype's OSS repository, https://oss.sonatype.org/content/repositories/releases/com/gravity/goose/
-
-    <dependency>
-      <groupId>com.gravity</groupId>
-      <artifactId>goose</artifactId>
-      <version>2.1.22</version>
-    </dependency>
-
-##Regarding the port from Java to Scala
-
-Here are some of the reasons for the port to Scala:
-
- - Gravity has moved more towards Scala development internally so maintenance started to become an issue
- - There wasn't enough contribution to warrant keeping it in Java
- - The packages were all namespaced under a person's name and not the company's name
- - Scala is more fun
-
-
-##Issues
-
-It was a pretty fast Java to Scala port so lots of the nicities of the Scala language aren't in the codebase yet, but those will come over the coming months as we re-write alot of the internal methods to be more Scalesque.
-We made sure it was still nice and operable from Java as well so if you're using goose from java you still should be able to use it with a few changes to the method signatures.
-
-
-##Goose is now language aware
-
-The stopword lists introduced in the [Python-Goose project](https://github.com/grangier/python-goose) have been incorporated
-into Goose.
-
-##Release
-- release with standard maven process at http://raisercostin.googlecode.com/svn/maven2/com/gravity/goose/
-
-	    mvn release:prepare -Prelease -DskipTests -Darguments="-DskipTests -Prelease"
-		mvn release:perform -Prelease -DskipTests -Darguments="-DskipTests -Prelease"
-
-- configure your ~/.m2/settings.xml as
-
-		<servers>
-		  <server>
-			<id>raisercostin-releases</id>
-			<username>svn-user</username>
-			<password>svn-pass</password>
-		  </server>
-		</servers>
+Please, feel free to raise an issue, fork the repo, send pull requests...
+Any idea or improvement will be welcome.
