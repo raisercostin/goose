@@ -1,7 +1,7 @@
-#Gander [![Circle CI](https://img.shields.io/circleci/project/intenthq/gander.svg)](https://circleci.com/gh/intenthq/gander) [![Coverage Status] (https://img.shields.io/coveralls/intenthq/gander.svg)](https://coveralls.io/github/intenthq/gander?branch=master) [![Maven Central](https://img.shields.io/maven-central/v/com.intenthq/gander_2.11.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.intenthq%22%20AND%20a%3A%22gander_2.11%22) [![Join the chat at https://gitter.im/intenthq/gander](https://img.shields.io/badge/gitter-join%20chat-green.svg)](https://gitter.im/intenthq/gander)
+#Gander [![Build Status](https://img.shields.io/travis/intenthq/gander.svg)](https://travis-ci.org/intenthq/gander) [![Coverage Status] (https://img.shields.io/coveralls/intenthq/gander.svg)](https://coveralls.io/github/intenthq/gander?branch=master) [![Maven Central](https://img.shields.io/maven-central/v/com.intenthq/gander_2.11.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.intenthq%22%20AND%20a%3A%22gander_2.11%22) [![Join the chat at https://gitter.im/intenthq/gander](https://img.shields.io/badge/gitter-join%20chat-green.svg)](https://gitter.im/intenthq/gander)
 
 **Gander is a scala library that extracts metadata and content from web pages.**
- 
+
 It is based on [Goose](https://github.com/GravityLabs/goose) with the idea to:
 - Simplify its codebase by removing some of its functionality (like crawling, there are plenty of project that do it well)
 - Keep it alive (goose has been inactive for several years now)
